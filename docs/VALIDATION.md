@@ -1,5 +1,17 @@
 # 本地验证记录
 
+## 真实 SDK 串口台架发送 APK — 2026-10-17
+
+用户自报前版只读测试成功。本版构建提交 `e416c40da09198cfef514723ebdb90f20a53351c`，[CI39025458514](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39025458514) success；前两次迭代CI39025224335/39025292793亦通过，最终包包括重复启动/释放失败时锁存停止的修正。
+
+`g12-serial-bench-0.3.0.apk`，3,247,563字节，SHA256 `faeb4915d35c9375da9ed2f7918b6679427a792def66795bc331b26f9ce44458`；本机下载后再次核对一致。独立包名`com.g12.bench.sender`，实际官方SDK1.9.2管道、target Android13/API33、ARMv7/ARM64。[机器证据](evidence/serial-bench-20261017.json)、[私有预发布与电脑工具](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.3.0-serial-bench)。
+
+本地/CI均通过597项原核心、21项只读会话、158项发送断言；12项Python测试包括3种实际Java控制/释放帧与独立pymavlink逐字节核对、PC收包分片/CRC/目标过滤/半帧超时及8项仲裁测试。构建/lint、14个原生库与官方AAR逐字节比较、权限、签名、ZIP对齐、真实管道引用和禁止参数/解锁/模式/升级调用检查通过。原只读APK也重新构建/lint并检查无writeData边界。
+
+最终CI artifact id `12098257933`，`g12-serial-bench-android13`，ZIP digest `sha256:07c82697e3fe931e2fc3a1b842999a6e6b91867b5093462b2a9a8a636d859d65`，保存至2026-11-16；本地 `artifacts/ci-39025458514-sender/` 和 `artifacts/release-sender/`。源码、PC收包工具、构建与现场步骤见[SERIAL_BENCH](SERIAL_BENCH.md)。
+
+发送APK和PC脚本未连接真实硬件运行。必须GR00 UART只接电脑并逐帧回显；非完整双链路控制、非X9台架验收、非适航结论。源端采样新鲜度和跨设备强制互斥仍未解决；回调近期/SDK返回/电脑回显均不能改称飞控接受。具体UART波特率、通道校准、系统构建和电气接口仍需用户现场确认。未自动安装APK、真实发送、解锁、刷写或飞行。
+
 ## 官方 SDK Android13 只读 APK — 2026-10-17
 
 构建提交 `4780fae73d44716121ca4e504f04779e1ba1fceb`，[CI39023451442](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39023451442) success。真正包含官方 RCSDK1.9.2，包名 `com.g12.bench.readonly`，目标 Android13/API33，min23，ARMv7和ARM64。APK `g12-sdk-readonly-0.2.0.apk`，3,231,035字节；SHA256 `259541b12cd22488ca01084b1632c6454249add1fed7db0f7ee43a863bbe9722`，下载后本机再次核对一致。[机器可读证据](evidence/sdk-bench-20261017.json)。[私有预发布下载](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.2.0-sdk-readonly)。

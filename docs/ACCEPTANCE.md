@@ -2,6 +2,8 @@
 
 ## 已有可核查交付
 
+- [x] 用户自报只读版成功后，新增独立真实SDK串口发送台架APK与PC收包/回显工具；最终[CI39025458514](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39025458514)通过，详情及SHA256见[验证记录](VALIDATION.md)。默认停止、显式映射/ID、单帧在途、10秒窗口、故障/后台/重复启动/释放失败停止；仅飞控断开的电脑收包，不是双链路或飞行验收。
+
 - [x] 独立项目；未改动 X9 工程或射频固件。
 - [x] 私有 GitHub 仓库 `unununnnn/g12-mavlink-control`，身份经实际 gh API 核实。
 - [x] 需求、架构、SDK契约、来源、构建、风险说明。

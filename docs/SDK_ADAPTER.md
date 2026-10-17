@@ -1,5 +1,7 @@
 # 云卓 SDK 适配边界
 
+**发送版更新：**独立 `sender` 已调用真实 `createG12G20Pipeline/connectPipeline/writeData/disconnectPipeline`，仅用于飞控断开的电脑串口收包；有明确映射、手动启停与单帧回显限制。不是打开原模拟硬件工厂，原只读 `bench` 仍不发送。SDK端点、内部排队和系统辅助程序检查见[SERIAL_BENCH](SERIAL_BENCH.md)。
+
 `bench` 已接入官方 RCSDK1.9.2 的初始化、G12 原始通道 GET 和链路 LISTEN，目标为用户确认的 Android13 G12。完整打包依据、ABI、构建、验收和未验证边界见 [SDK_BENCH](SDK_BENCH.md)。这不是完整遥控版，实际 G12 尚未运行验收。
 
 官方 [RCSDK-Demo](https://gitee.com/skydroid/rcsdk-demo) commit `d9c6bcab8bb9993cd16f117c01a7601dce10ea6a`，AAR SHA256 `e5977ba3292246bcee026defdb8563a18adc9d5573fdfb20a6880ee469f0fde2`。厂商 README 明确提供空白 Android 项目集成方式；本次按此用途制作私有台架 APK。仓库未声明通用开源/再分发许可证，不据此声称可以公开/商业分发或单独分发SDK。AAR只在仓库外/忽略目录使用，不提交厂商二进制或签名密钥。
