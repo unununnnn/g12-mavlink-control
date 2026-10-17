@@ -2,6 +2,8 @@
 
 2026-10-17，用户进一步确认触发条件为“点击停止后再次开启会出现 code=101 timeout”，与对频无关；当前目标限定为摇杆读取和启停稳定性。
 
+安装包：[私有预发布 v0.3.1](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.3.1-serial-bench)，同时提供发送版0.3.1和只读版0.2.1。代码提交 `0fe0496465a70866e55d8ba0b22097131f63a35b`；[CI 39026980391](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39026980391) 构建、lint及APK验证成功（发送版lint 0错误/17警告）。下载后SHA256与构建报告一致，DEX已核实包含新连接封装。详见[交付证据](evidence/restart-20261017.json)。
+
 ## 证据与边界
 
 - 0.3.0 与 0.2.0 共用相同的 `SkydroidBackend` 和 GET `RemoteControllerKey.KeyChannels`。旧普通停止直接调用 `disconnectRC()`，下次开始调用 `connectToRC()`。
