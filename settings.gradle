@@ -3,4 +3,6 @@ dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_P
 rootProject.name = 'g12-mavlink-control'
 include ':core', ':app'
 include ':bench-core'
+include ':sender-core'
 if (providers.gradleProperty('withSkydroid').orNull == 'true') { include ':bench' }
+if (providers.gradleProperty('withSkydroid').orNull == 'true') { include ':sender' }

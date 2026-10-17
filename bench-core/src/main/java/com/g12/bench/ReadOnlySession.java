@@ -100,6 +100,7 @@ public final class ReadOnlySession {
     public long age() { return receivedAt < 0 ? -1 : Math.max(0, clock.millis() - receivedAt); }
     public boolean stale() { return age() < 0 || age() >= STALE_MS; }
     public long samples() { return samples; }
+    public long receiptMillis() { return receivedAt; }
     public String signal() { return signal; }
     public long signalAge() { return signalAt < 0 ? -1 : Math.max(0, clock.millis() - signalAt); }
     public Integer quality() { return quality; }

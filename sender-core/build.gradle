@@ -1,0 +1,13 @@
+plugins { id 'java-library' }
+java { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
+// Reuse only the codec; the simulation control session is never linked into the sender APK.
+sourceSets.main.java {
+    srcDir '../core/src/main/java'
+    include 'com/g12/sendercore/**', 'com/g12/core/Mavlink.java'
+}
+tasks.register('regression', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.g12.sendercore.SenderTests'
+}
+tasks.named('check') { dependsOn regression }

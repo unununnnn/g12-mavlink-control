@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** Deliberately restricted, unsigned MAVLink 2 codec for offline development. */
+/** Restricted, unsigned MAVLink 2 codec. Callers enforce simulation or PC-bench transport policy. */
 public final class Mavlink {
     private Mavlink() { }
     public static final int HEARTBEAT = 0, MANUAL = 69, OVERRIDE = 70, VERSION = 148;
@@ -14,10 +14,12 @@ public final class Mavlink {
     public static final class Frame {
         public final int system, component, sequence, message;
         private final byte[] payload;
-        Frame(int s, int c, int q, int m, byte[] p) {
-            system = s; component = c; sequence = q; message = m; payload = p.clone();
+        private final byte[] wire;
+        Frame(int s, int c, int q, int m, byte[] p, byte[] original) {
+            system = s; component = c; sequence = q; message = m; payload = p.clone(); wire = original.clone();
         }
         public byte[] payload() { return payload.clone(); }
+        public byte[] wire() { return wire.clone(); }
         public ByteBuffer fields() { return little(payload.clone()); }
     }
 
@@ -101,7 +103,7 @@ public final class Mavlink {
         if (wanted != crc(bytes, n + 10, extra(m))) throw new IllegalArgumentException("CRC");
         byte[] p = new byte[size(m)];
         System.arraycopy(bytes, 10, p, 0, n);
-        return new Frame(bytes[5] & 255, bytes[6] & 255, bytes[4] & 255, m, p);
+        return new Frame(bytes[5] & 255, bytes[6] & 255, bytes[4] & 255, m, p, bytes);
     }
 
     /** Bounded parser. A partial frame expires after 250ms of receive silence. */

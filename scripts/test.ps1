@@ -16,4 +16,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Bench javac failed' }
     & $java -cp artifacts/classes com.g12.bench.ReadOnlySessionTest
     if ($LASTEXITCODE -ne 0) { throw 'Bench regression failed' }
+    $senderSources = @(Get-ChildItem sender-core/src -Recurse -Filter '*.java' | ForEach-Object FullName)
+    & $javac --release 17 -Xlint:all -Werror -encoding UTF-8 -cp artifacts/classes -d artifacts/classes @senderSources
+    if ($LASTEXITCODE -ne 0) { throw 'Sender javac failed' }
+    & $java -cp artifacts/classes com.g12.sendercore.SenderTests
+    if ($LASTEXITCODE -ne 0) { throw 'Sender regression failed' }
 } finally { Pop-Location }
