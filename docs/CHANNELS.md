@@ -10,7 +10,7 @@
 
 前台断开保留SDK读取连接；重新连接先排空旧读取。进入后台完整释放SDK，回前台需再次点击连接。数传关闭等待旧写调用和断开都结束；迟到的旧管道回调不能影响新连接。诊断页可以完整释放SDK端口。
 
-包名仍为 `com.g12.x9`，版本代码5，版本名0.5.0-x9-direct，界面名称改为“G12 通道直传”。使用CI生成的debug签名；若覆盖安装提示签名不一致，需先卸载旧0.4再安装本版。旧档案不再读取，也不会恢复发送授权。
+包名仍为 `com.g12.x9`，版本代码5，版本名0.5.0-x9-direct，界面名称改为“G12 通道直传”。已确认本次CI生成的debug签名与0.4不同，需先卸载旧0.4再安装本版。旧档案不再读取，也不会恢复发送授权。
 
 ## 自动发现与协议边界
 
@@ -27,6 +27,10 @@
 协议依据：[MAVLink RC_CHANNELS_OVERRIDE](https://mavlink.io/en/messages/common.html#RC_CHANNELS_OVERRIDE)、[ArduPilot RC输入](https://ardupilot.org/dev/docs/mavlink-rcinput.html)。RC_CHANNELS反馈用于观察数值跟随，不是逐帧ACK、密码学身份认证或独占控制权。
 
 ## 验证与构建
+
+已发布[0.5.0 APK与校验附件](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.5.0-x9-direct)，源码提交 `66ee81c036de501d62280bc8d8f54ae79436e834`。[Android构建](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39031055750)通过，Java共21289项断言、Python15项测试通过，lint为0错误、12项非阻断警告（文本国际化、图标、备份声明）。APK SHA256为 `ef7fd4e6a90e5e1ea839a56b9787c26c50077a536b40ec9ff27d4c86a7c31cd4`，本地下载与GitHub附件摘要一致。
+
+隔离SITL在提交 `816b5b1` 上通过，至发布提交仅增加测试输出目录创建，生产源码和仿真入口没有变化。实际收到130个覆盖帧，全部18个报文字段独立核对，前16通道反馈跟随、断开停发、再次连接发送和输入过期停发均通过。见[交付证据](evidence/channels-20261017.json)及[原始SITL报告](evidence/channel-sitl-20261017.json)。
 
 `scripts/test.ps1` / `bash scripts/test.sh`增加ChannelTests，同时保留旧版回归。`python -m unittest lab.test_serial_echo lab.test_arbiter lab.test_x9_wire -v`独立核对16/18通道MAVLink2、8通道MAVLink1的全部字节与辅助通道值。测试覆盖直接连接发送、切换目标后重连、不使用UID/版本/档案、持续已解锁合成状态超过65秒、失联、旧回调、输入失效及容量错误。
 

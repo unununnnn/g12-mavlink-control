@@ -35,4 +35,4 @@ python ./scripts/check_vectors.py
 
 Android 构建需要 JDK 17、Gradle 8.11.1、Android SDK Platform 35 / Build Tools 35.0.0，详见 [构建与测试](docs/BUILD_TEST.md)。未附带第三方 SDK、签名私钥、凭据或生产配置。
 
-**完整控制的硬件阻塞**：仍须确认具体系统构建、真实源端新鲜度、GR00电气/数据行为、目标UID和能够强制排他的仲裁落点。只读集成按官方空白项目集成指引实施，公开/商业再分发范围未确认。模拟Android控制帧仅进入进程内存；独立lab只向自己启动的隔离SITL进程发送。[SITL复现与边界](docs/SITL.md)、[仲裁设计](docs/ARBITRATION.md)、[阻塞与最小补充信息](docs/BLOCKERS.md)。
+**当前硬件待验收**：具体系统兼容性、真实源端采样时效、GR00电气/数据行为、启停超时修复及主备控制互斥仍需真机验证。0.5不要求UID绑定；本次取消绑定不等于已解决跨设备互斥。SDK集成按官方空白项目集成指引实施，公开/商业再分发范围未确认。原模拟Android控制帧仅进入进程内存；独立lab只向自己启动的隔离SITL进程发送。[SITL复现与边界](docs/SITL.md)、[历史仲裁设计](docs/ARBITRATION.md)、[硬件调查记录](docs/BLOCKERS.md)。
