@@ -61,3 +61,9 @@ python -m unittest lab.test_arbiter -v
 已将未改写的本地报告归档为 [local-sitl-20261017.json](evidence/local-sitl-20261017.json)，并核对其测试脚本SHA256与提交 `7b57035cddebd0da1af5bd4c95d0f0a10402f470` 中的文件字节一致。该代码提交的完整CI复核为 [39015334397](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39015334397)，远端状态和artifact以该运行页为准。随后只归档文档/JSON证据的提交不重复触发编译；没有更改被测代码。
 
 现有dot项目还保存了《SITL 与仲裁验证交接（2026-10-17）》文本来源，内容已打开预览核对，包含代码提交、CI链接、实测发现与下一阶段阻塞。项目资料是交接上下文，不代表本地Git目录后台同步。
+
+## CI最终复核
+
+[CI39015334397](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39015334397) 在代码提交 `7b57035` 上两个job均 **success**：`verify`（597条Java断言、8项仲裁回归、Android编译/lint）和 `sitl`（全新Ubuntu22.04固定源码构建、4类独立协议向量、8项仲裁回归、16项SITL检查）。SITL报告与运行日志已从 `g12-stock-sitl-evidence` 下载；未改写的报告长期归档为 [ci-sitl-39015334397.json](evidence/ci-sitl-39015334397.json)。再次核对result=PASS、16项、参数前后一致、project_head与测试脚本SHA256匹配代码提交。CI覆盖超时实测3.050s，本地为3.004s。
+
+此前 [CI39014760575](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39014760575) 的构建失败原因已从下载日志确认：`AP_Networking.cpp:487`缺少`lwip/ip4_addr.h`。修正为取齐固定`modules/lwip`，未关闭网络编译功能、安全检查或failsafe。最终成功记录替代该失败轮次作为本阶段CI结论；旧日志仍在本机artifacts中供追溯。
