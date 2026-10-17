@@ -14,8 +14,8 @@ local.properties
 *.apk
 *.aab
 .env*
-vendor/
-sdk/
+/vendor/
+/sdk/
 artifacts/
 tmp/
 __pycache__/

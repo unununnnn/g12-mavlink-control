@@ -8,6 +8,7 @@ G12 Android 应用的**模拟开发基线**，目标为云卓 SDK 读取真实�
 
 - `core`: 无 Android 依赖的 Java 协议、流解析、目标识别及模拟接管状态机。
 - `app`: Android 原生界面，显式启动模拟、模拟接管、冻结输入、交还与生命周期停止；无网络/串口权限。
+- `sdk-probe`: 按官方RCSDK1.9.2真实类型编译核对的原创只读请求类，未集成APK、未执行SDK、输出不具控制授权效力。
 - `scripts/test.ps1` / `scripts/test.sh`: JDK 17+ 离线回归，无第三方 Java 测试依赖。
 - `scripts/check_vectors.py`: 与已安装 pymavlink 独立交叉验证协议向量。
 - `docs`: 需求、架构、SDK 边界、来源、构建、验收与风险。
@@ -23,4 +24,4 @@ python ./scripts/check_vectors.py
 
 Android 构建需要 JDK 17、Gradle 8.11.1、Android SDK Platform 35 / Build Tools 35.0.0，详见 [构建与测试](docs/BUILD_TEST.md)。未附带第三方 SDK、签名私钥、凭据或生产配置。
 
-**硬件阻塞**：须取得可授权使用的 G12 SDK、匹配固件版本和文档，确认摇杆有效/失联语义、GR00 发送接口、目标 UID、主备仲裁和飞控 failsafe，再单独设计硬件构建。当前所有控制帧只进入进程内存。
+**硬件阻塞**：已定位并核对官方RCSDK1.9.2；尚须确认许可、匹配固件、摇杆有效/失联语义、GR00行为、目标 UID、主备仲裁和飞控 failsafe，再单独设计硬件构建。当前所有控制帧只进入进程内存。

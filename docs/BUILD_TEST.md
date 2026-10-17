@@ -20,6 +20,10 @@ GitHub Actions `Verify simulation` 使用 runner 预装 Android 工具并下载�
 
 不自动连接设备，不调用 adb、不安装、不解锁、不发送真实控制。当前没有 Android 仪器化测试或 G12 UI/SDK 运行验证，编译/lint通过也不等于运行验收。
 
+## 可选SDK只读签名核对
+
+`sdk-probe` 不在 settings.gradle 中，普通构建不包含厂商类。将官方RCSDK保存在仓库外后运行 `./scripts/check_sdk_signatures.ps1 -SdkAar <rcsdk-v1.9.2.aar绝对路径>`。脚本先校验已核实SHA256，再提取class文件供javac编译原创只读类；不会执行厂商SDK、初始化设备或把SDK打进APK。实际编译已通过；这是API链接检查，不是SDK运行或故障注入验收。
+
 ## 后续隔离模拟/SITL
 
 本阶段仅进程内模拟，没有运行 SITL。后续可在无真实飞控/遥测路由的隔离网络运行固定4.7.1 SITL；须先增加仅限显式 loopback 的模拟适配，不能在现版本假称已经支持。记录原 failsafe/围栏参数，禁止通过关闭安全功能让测试通过。验证输入停止后 override 超时、GCS failsafe、不健康 SBUS 交还拒绝、两端同时请求和进程崩溃。当前互斥只限单进程，跨设备测试必须先设计仲裁。

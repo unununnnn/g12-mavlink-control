@@ -2,12 +2,14 @@
 
 ## 公开一手资料
 
-1. [云卓官方网站](https://www.skydroid.xin/)：可访问，SPA 页面；不是 SDK 接口文档。官网产品名不能证明 SDK 类名或签名。检查到官方前端入口 `/static/js/index-6e7c9923.js`，未取得已核实 G12 SDK 版本或接口，因此未实现厂商 API 调用。
+1. [云卓官方网站](https://www.skydroid.xin/)：SPA 页面；沿其公开下载中心前端 `/static/js/index-687a9938.js` 找到明确标注支持 G12 的 RCSDK 链接。前端调用的公开资料目录 `/api/portal/dataFiles/getDetailsTreeList` 列有 G12 产品说明书V2.1（2026-09-21）及 GR00 原理图/PIN脚/规格说明书V1.0（2026-09-14）。这些资料未再分发到仓库。
 2. [厂商 G12 产品页](https://skydroidglobal.com/products/skydroid-g12-remote-controller) 和 [技术支持](https://skydroidglobal.com/pages/skydroid-support)：产品与支持入口，本次可见内容不能提供可验证的摇杆/串口 SDK 方法。
 3. [MAVLink 序列化规范](https://mavlink.io/en/guide/serialization.html) 与 [消息定义](https://mavlink.io/en/messages/common.html#MANUAL_CONTROL)：v2 帧头、CRC_EXTRA、截短规则和 MANUAL_CONTROL 字段。实现仅涵盖文档所列4类消息，不声称是完整 MAVLink 栈。
 4. [ArduPilot RC Input 文档](https://ardupilot.org/dev/docs/mavlink-rcinput.html)：描述 MAVLink 覆盖普通 RC、停止输入后的超时恢复、输入缩放和门控。该在线文档可变化，具体行为以下方固定版本源码为准。没有采用文档中禁用 failsafe 的示例。
 5. [Copter-4.7.1 GCS_Common.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/GCS_MAVLink/GCS_Common.cpp)：tag 经 GitHub API 核对，commit `dbe792162d06cab66c3475fd5556bf7a120f119e`。`handle_manual_control` 检查发送方 GCS sysid、目标 sysid，并调用 `sysid_mygcs_seen`。只参考行为，没有复制 GPL 飞控代码。
 6. [Android AGP 8.9 兼容表](https://developer.android.com/build/releases/agp-8-9-0-release-notes)：AGP 8.9.2，Gradle 8.11.1，JDK17，最高 compile SDK35，Build Tools35.0.0。
+7. [官方RCSDK-Demo](https://gitee.com/skydroid/rcsdk-demo)，本地固定commit `d9c6bcab8bb9993cd16f117c01a7601dce10ea6a`：README、HomeActivityForJava.java、ReadRCButtonHelper.java、app/build.gradle及AAR公开签名核对。版本1.9.2，AAR SHA256 `E5977BA3292246BCEE026DEFDB8563A18ADC9D5573FDFB20A6880EE469F0FDE2`。G12采用KeyChannels GET；Pipeline写接口返回void，不能当成飞控接收ACK。README记录SDK1.7.3的G12/G20管道改UDP且有系统版本条件。没有LICENSE文件，Gitee也提示未声明许可证；不把厂商源码/AAR纳入本仓库。
+8. 下载中心的 G12产品说明书V2.1 已只读提取，共113页，PDF第56页/正文第51页再次明确链接RCSDK-Demo；与官网前端链接一致。GR00资料包已确认可下载（3956431字节），其中为RAR文档包，尚不能据“已下载”声称完成针脚/电平核对。
 
 ## 本地证据（仅只读，不再分发）
 
@@ -18,4 +20,4 @@
 
 ## 仍不可推断
 
-G12 SDK 版本、原始摇杆有效位/采样时间、GR00 串口方法和电平、射频失联时是否重播、X9 实际 UID/厂商补丁均未知。模拟中的 UID 和 sysid 是明确的合成值，不能拿去识别实机。
+已确认公开 SDK 版本和部分调用签名；原始摇杆有效位/采样时间、GR00实际电平/固件匹配、射频失联是否重播、X9 实际 UID/厂商补丁仍未知。模拟中的 UID 和 sysid 是明确的合成值，不能拿去识别实机。
