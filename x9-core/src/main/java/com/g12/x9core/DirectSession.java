@@ -99,6 +99,9 @@ public final class DirectSession {
         }
         if(parser.signedSeen&&active())fault("检测到MAVLink签名帧；本版未配置签名认证，不绕过保护");
     }
+    /** Evaluate transport identity under the same lock as stop/connect, not in an SDK callback beforehand. */
+    public synchronized void receiveFrom(Link origin,byte[] bytes){if(origin==link&&active())receive(bytes);}
+    public synchronized void faultFrom(Link origin,String reason){if(origin==link&&active())fault(reason);}
     private static String hexNonzero(byte[] d,int start,int end) {boolean any=false;for(int i=start;i<end;i++)any|=d[i]!=0;return any?hex(d,start,end):null;}
     private static String hex(byte[] d,int start,int end){StringBuilder b=new StringBuilder();for(int i=start;i<end;i++){b.append(Character.forDigit((d[i]>>>4)&15,16));b.append(Character.forDigit(d[i]&15,16));}return b.toString();}
     private void finishVerification() {

@@ -31,9 +31,9 @@ public final class SdkLink implements DirectSession.Link {
             Pipeline p=PipelineManager.INSTANCE.createG12G20Pipeline();if(p==null||p.getPipelineType()!=PipelineType.UDP)throw new IllegalStateException("SDK管道类型不匹配");pipeline=p;
             p.setOnCommListener(new CommListener(){
                 @Override public void onConnectSuccess(){if(active)ready=true;}
-                @Override public void onConnectFail(SkyException e){if(active)session.fault("SDK管道连接失败："+(e==null?"未知":e.getErrorCode()));}
-                @Override public void onDisconnect(){if(active)session.fault("数传管道断开，需手动连接");}
-                @Override public void onReadData(byte[] bytes){if(active&&bytes!=null)session.receive(bytes.clone());}
+                @Override public void onConnectFail(SkyException e){session.faultFrom(SdkLink.this,"SDK管道连接失败："+(e==null?"未知":e.getErrorCode()));}
+                @Override public void onDisconnect(){session.faultFrom(SdkLink.this,"数传管道断开，需手动连接");}
+                @Override public void onReadData(byte[] bytes){if(bytes!=null)session.receiveFrom(SdkLink.this,bytes.clone());}
             });PipelineManager.INSTANCE.connectPipeline(p);
         }catch(RuntimeException|LinkageError e){close();throw e;}
     }

@@ -74,6 +74,9 @@ public final class DirectTests {
         continuous.raw[4]=1000;continuous.run(200);int stopped=continuous.controls;continuous.run(1000);
         check(continuous.controls==stopped&&continuous.s.state()==DirectSession.State.STANDBY,"switch off stops refresh without release or neutral");continuous.s.stop("done");
         Rig onAtConnect=new Rig();Profile saved=onAtConnect.discover();onAtConnect.raw[4]=2000;onAtConnect.begin(saved);onAtConnect.run(2500);
+        Rig retiredPipe=new Rig();long hbAge=onAtConnect.s.heartbeatAge();onAtConnect.s.faultFrom(retiredPipe,"late old disconnect");
+        byte[] otherHb=new byte[9];otherHb[4]=2;otherHb[5]=3;otherHb[8]=3;onAtConnect.s.receiveFrom(retiredPipe,Wire.encode(2,8,1,1,0,otherHb));
+        check(onAtConnect.s.state()==DirectSession.State.STANDBY&&onAtConnect.s.heartbeatAge()==hbAge,"old transport callbacks cannot fault or refresh a new connection");
         check(onAtConnect.controls==0,"held ON cannot reconnect into transmission");onAtConnect.raw[4]=1000;onAtConnect.run(200);onAtConnect.take();onAtConnect.s.stop("done");
         Rig inputLoss=new Rig();inputLoss.ready();inputLoss.take();inputLoss.inputs=false;inputLoss.run(300);check(inputLoss.s.state()==DirectSession.State.FAULT,"stale local input stops");
         int count=inputLoss.controls;inputLoss.inputs=true;inputLoss.run(1000);check(inputLoss.controls==count,"no automatic recovery after fault");
