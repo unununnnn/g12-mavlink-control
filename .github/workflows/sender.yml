@@ -34,9 +34,12 @@ jobs:
         run: gradle --no-daemon -PwithSkydroid=true :sender-core:check :sender:assembleDebug :sender:lintDebug :bench:assembleDebug :bench:lintDebug
       - name: Inspect actual sender and preserve readonly boundary
         run: |
-          cp sender/build/outputs/apk/debug/sender-debug.apk artifacts/sender/g12-serial-bench-0.3.0.apk
-          python scripts/verify_sender.py artifacts/sender/g12-serial-bench-0.3.0.apk vendor/rcsdk-v1.9.2.aar
-          python scripts/verify_bench.py bench/build/outputs/apk/debug/bench-debug.apk vendor/rcsdk-v1.9.2.aar
+          cp sender/build/outputs/apk/debug/sender-debug.apk artifacts/sender/g12-serial-bench-0.3.1.apk
+          python scripts/verify_sender.py artifacts/sender/g12-serial-bench-0.3.1.apk vendor/rcsdk-v1.9.2.aar
+          mkdir -p artifacts/bench
+          cp bench/build/outputs/apk/debug/bench-debug.apk artifacts/bench/g12-sdk-readonly-0.2.1.apk
+          python scripts/verify_bench.py artifacts/bench/g12-sdk-readonly-0.2.1.apk vendor/rcsdk-v1.9.2.aar
+          cp docs/RESTART_FIX.md artifacts/sender/
           cp lab/serial_echo.py lab/serial-requirements.txt docs/SERIAL_BENCH.md artifacts/sender/
           cp artifacts/sender-vectors.json artifacts/sender/
       - uses: actions/upload-artifact@v4
@@ -44,6 +47,7 @@ jobs:
           name: g12-serial-bench-android13
           path: |
             artifacts/sender/
+            artifacts/bench/
             sender/build/reports/lint-results-debug.html
             sender/build/reports/lint-results-debug.xml
           if-no-files-found: error

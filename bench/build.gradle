@@ -15,8 +15,8 @@ android {
         minSdk 23
         // User-confirmed G12 OS: Android 13. Actual vendor system build remains unverified.
         targetSdk 33
-        versionCode 2
-        versionName '0.2.0-sdk-readonly'
+        versionCode 3
+        versionName '0.2.1-sdk-readonly'
         ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }

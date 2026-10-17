@@ -30,8 +30,8 @@ jobs:
         run: gradle --no-daemon -PwithSkydroid=true :bench-core:check :bench:assembleDebug :bench:lintDebug
       - name: Inspect SDK contents, compiled boundary, permissions and signature
         run: |
-          cp bench/build/outputs/apk/debug/bench-debug.apk artifacts/bench/g12-sdk-readonly-0.2.0.apk
-          python3 scripts/verify_bench.py artifacts/bench/g12-sdk-readonly-0.2.0.apk vendor/rcsdk-v1.9.2.aar
+          cp bench/build/outputs/apk/debug/bench-debug.apk artifacts/bench/g12-sdk-readonly-0.2.1.apk
+          python3 scripts/verify_bench.py artifacts/bench/g12-sdk-readonly-0.2.1.apk vendor/rcsdk-v1.9.2.aar
       - uses: actions/upload-artifact@v4
         with:
           name: g12-sdk-readonly-android13

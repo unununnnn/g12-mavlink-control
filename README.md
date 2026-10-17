@@ -1,5 +1,7 @@
 # G12 MAVLink Control
 
+**启停修复候选版：sender 0.3.1 / readonly 0.2.1。** 用户定位到“停止后再次读取出现 SDK code=101 timeout”。前台停止采集现在保留 SDK 连接，恢复时等旧请求结束后发起新 GET；释放端口和后台仍完整断开。软件回归通过，G12 实测待确认。见[启停修复与复测步骤](docs/RESTART_FIX.md)。
+
 **最新交付：**用户自报只读版测试成功后，新增独立 `sender` **真实SDK串口台架发送版**。仅用于GR00 UART接电脑收包/逐帧回显，飞控断开；显式映射、启停、最多一帧在途和10秒窗口。不是完整双链路遥控或飞行版本。见[发送版说明](docs/SERIAL_BENCH.md)。
 
 G12 Android 应用与**隔离 SITL 开发项目**，目标为云卓 SDK 读取真实摇杆，经 GR00 数传向 X9 / ArduCopter 4.7.1 传递 MAVLink 控制。新增独立 `bench` 真正集成官方 RCSDK1.9.2，面向用户确认的 Android13 G12，读取通道与链路信息；**仅台架只读，未真机验收，不是完整遥控版**。原 `app` 仍是独立模拟包。见 [SDK台架APK与兼容边界](docs/SDK_BENCH.md)。

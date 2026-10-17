@@ -16,6 +16,8 @@ public final class ReadOnlySession {
     public interface Backend {
         void start(Events events);
         void read(Result result);
+        /** Stop delivery/requests while retaining the foreground SDK connection if supported. */
+        default void pause() { stop(); }
         void stop();
     }
     public enum State { IDLE, CONNECTING, READING, STOPPED }
@@ -87,6 +89,10 @@ public final class ReadOnlySession {
     public void stop(String reason) {
         epoch++; state = State.STOPPED; clear(); message = reason;
         try { backend.stop(); } catch (RuntimeException | LinkageError e) { warning = "SDK 断开异常: " + e.getClass().getSimpleName(); }
+    }
+    public void pause(String reason) {
+        epoch++; state = State.STOPPED; clear(); message = reason;
+        try { backend.pause(); } catch (RuntimeException | LinkageError e) { stop("暂停失败，已释放 SDK: " + e.getClass().getSimpleName()); }
     }
     private void clear() {
         pending = false; channels = null; signal = null; quality = null; warning = "";

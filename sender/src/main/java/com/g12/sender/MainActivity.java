@@ -56,11 +56,13 @@ public final class MainActivity extends Activity {
         engine = new SendEngine(SystemClock::elapsedRealtime);
         ScrollView scroll = new ScrollView(this); LinearLayout body = column();
         body.setPadding(18,12,18,20); body.setBackgroundColor(Color.rgb(245,248,252)); scroll.addView(body);setContentView(scroll);
-        text(body,"G12 串口台架发送 · v0.3.0",24);
+        text(body,"G12 串口台架发送 · v0.3.1",24);
         text(body,"真实SDK → GR00 UART → 电脑收包/逐帧回显\n不是SBUS。不是双链路接管版。飞控必须断开。",17);
         text(body,"默认停止；每次最多10秒、每个新回调最多一帧、最多一帧在途。回显仅证明字节返回，不证明飞控接受。源端新鲜度未获厂商证明。",15);
         button(body,"1. 开始真实摇杆读取",() -> { stopLink("重新开始读取");forwarded=-1;input.start(); });
-        button(body,"全部停止 / 释放SDK端口",() -> { stopLink("用户停止：不自动发送释放帧");input.stop("用户停止");forwarded=-1; });
+        button(body,"停止采集与发送（保留SDK连接）",() -> { stopLink("用户停止：不自动发送释放帧");input.pause("采集已停止；SDK连接保留，可再次开始读取");forwarded=-1; });
+        button(body,"断开SDK / 释放端口",() -> { stopLink("用户释放SDK端口");input.stop("SDK端口已请求释放");forwarded=-1; });
+        text(body,"日常停止/再读使用上方停止采集按钮。切换助手或其他App前释放端口；退到后台也会释放。再次读取不会自动开始发送。",15);
         live=text(body,"",16);
         text(body,"2. 必填配置（改动立即停止，须重新确认）",20);
         message=new Spinner(this); message.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,
