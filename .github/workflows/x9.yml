@@ -34,10 +34,11 @@ jobs:
         run: gradle --no-daemon -PwithSkydroid=true :x9-core:check :x9:assembleDebug :x9:lintDebug
       - name: Inspect actual APK
         run: |
-          cp x9/build/outputs/apk/debug/x9-debug.apk artifacts/x9/g12-x9-direct-0.4.0.apk
-          python scripts/verify_x9.py artifacts/x9/g12-x9-direct-0.4.0.apk vendor/rcsdk-v1.9.2.aar
-          cp docs/X9_DIRECT.md artifacts/x9/
+          cp x9/build/outputs/apk/debug/x9-debug.apk artifacts/x9/g12-x9-direct-0.5.0.apk
+          python scripts/verify_x9.py artifacts/x9/g12-x9-direct-0.5.0.apk vendor/rcsdk-v1.9.2.aar
+          cp docs/CHANNELS.md artifacts/x9/
           cp artifacts/x9-vectors.json artifacts/x9/
+          cp artifacts/channel-vectors.json artifacts/x9/
       - uses: actions/upload-artifact@v4
         with:
           name: g12-x9-direct-android13

@@ -5,7 +5,7 @@ android {
     namespace 'com.g12.x9'
     compileSdk 35
     buildToolsVersion '35.0.0'
-    defaultConfig { applicationId 'com.g12.x9'; minSdk 33; targetSdk 33; versionCode 4; versionName '0.4.0-x9-direct'; ndk { abiFilters 'armeabi-v7a','arm64-v8a' } }
+    defaultConfig { applicationId 'com.g12.x9'; minSdk 33; targetSdk 33; versionCode 5; versionName '0.5.0-x9-direct'; ndk { abiFilters 'armeabi-v7a','arm64-v8a' } }
     sourceSets.main.java { srcDir '../bench/src/main/java'; exclude 'com/g12/bench/MainActivity.java','com/g12/bench/BenchApplication.java' }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     packaging { jniLibs { keepDebugSymbols += ['**/*.so'] } }

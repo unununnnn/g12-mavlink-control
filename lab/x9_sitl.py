@@ -12,13 +12,14 @@ from lab.sitl_e2e import Experiment, ROOT, require
 from pymavlink import mavutil
 
 
-def run(source, output):
+def run(source, output, channels=False):
     experiment = Experiment(source.resolve(), output.resolve())
     java = None
     try:
         experiment.start()
         experiment.report['scope'] = 'actual x9-core Java session over stdio, owned disarmed stock Copter 4.7.1, no hardware'
-        java = subprocess.Popen(['java', '-cp', str(ROOT/'artifacts/x9-sitl-classes'), 'com.g12.x9core.SitlHarness'],
+        experiment.report['controller'] = 'all18 raw channels, no setup/binding' if channels else 'bound four axes'
+        java = subprocess.Popen(['java', '-cp', str(ROOT/'artifacts/x9-sitl-classes'), 'com.g12.x9core.'+('ChannelSitlHarness' if channels else 'SitlHarness')],
                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 text=True, bufsize=1)
         lines = queue.Queue()
@@ -40,7 +41,11 @@ def run(source, output):
                     if kind == 'COMMAND_LONG':
                         require(msg.command == 512 and msg.param1 in (65, 148), 'Only telemetry reads allowed')
                     if kind == 'RC_CHANNELS_OVERRIDE':
-                        require(all(getattr(msg, f'chan{i}_raw') == 65535 for i in range(5, 19)), 'Auxiliary channel changed')
+                        expected = [1800,1300,1000,1650,1100,1000,1000,1000]+[1500]*10
+                        if channels:
+                            require([getattr(msg, f'chan{i}_raw') for i in range(1,19)] == expected, 'Raw channel order/value changed')
+                        else:
+                            require(all(getattr(msg, f'chan{i}_raw') == 65535 for i in range(5, 19)), 'Auxiliary channel changed')
                     counts[kind] = counts.get(kind, 0)+1
                     experiment.link.write(data)
                 else:
@@ -70,5 +75,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', required=True, type=Path)
     parser.add_argument('--output', type=Path, default=ROOT/'artifacts/x9-sitl')
+    parser.add_argument('--channels', action='store_true', help='Test raw all-channel controller instead of historical bound controller')
     args = parser.parse_args()
-    run(args.source, args.output)
+    run(args.source, args.output, args.channels)

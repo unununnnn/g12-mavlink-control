@@ -65,6 +65,18 @@ public final class Wire {
             b.putShort(ch<=8?(ch-1)*2:18+(ch-9)*2,(short)pwm[i]);}
         return encode(v,src,comp,seq,70,p);
     }
+    /** SDK channel index maps directly to the same RC channel; no axis scaling or reordering. */
+    public static byte[] channels(int v,int src,int comp,int seq,int target,int targetComp,int[] values){
+        validateChannels(values);
+        if(v==1&&values.length>8)throw new IllegalArgumentException("MAVLink1最多8通道；完整发送需要飞控串口使用MAVLink2");
+        byte[] p=new byte[38];ByteBuffer b=le(p);
+        for(int i=0;i<18;i++)b.putShort(i<8?i*2:18+(i-8)*2,(short)(i<values.length?values[i]:65535));
+        p[16]=(byte)target;p[17]=(byte)targetComp;return encode(v,src,comp,seq,70,p);
+    }
+    public static void validateChannels(int[] values){
+        if(values==null||values.length<1||values.length>18)throw new IllegalArgumentException("MAVLink单帧可传1～18通道；SDK通道数="+(values==null?0:values.length));
+        for(int i=0;i<values.length;i++)if(values[i]<800||values[i]>2200)throw new IllegalArgumentException("CH"+(i+1)+"原值="+values[i]+"，不是可直接发送的PWM范围；不猜测换算");
+    }
     /** Bounded full-frame consumption: unsupported or signed payloads cannot become nested frames. */
     public static final class Parser {
         private byte[] buffer=new byte[0];private long last=-1;

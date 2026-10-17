@@ -9,4 +9,4 @@ find x9-core/src -name '*.java' -print > artifacts/x9-sitl-sources.txt
 # Same production sources; Java 11 target accommodates the preinstalled WSL JDK.
 # Android and main regression builds separately compile with --release 17.
 javac --release 11 -Xlint:all -Werror -encoding UTF-8 -d artifacts/x9-sitl-classes @artifacts/x9-sitl-sources.txt
-exec python3 -m lab.x9_sitl --source "${1:?Provide fixed source/build directory}" --output "${2:-$PWD/artifacts/x9-sitl}"
+exec python3 -m lab.x9_sitl --source "${1:?Provide fixed source/build directory}" --output "${2:-$PWD/artifacts/x9-sitl}" "${@:3}"

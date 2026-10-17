@@ -1,6 +1,6 @@
 # 构建、测试与复现
 
-直连X9版本使用 `x9` / `x9-core`，构建命令及回归入口见 [X9_DIRECT](X9_DIRECT.md)。以下 `sender` 特指保留的电脑收包台架应用；其10秒窗口不适用于新直连应用。
+当前0.5全通道直传版本使用 `x9` / `x9-core`，构建命令及回归入口见 [CHANNELS](CHANNELS.md)。[X9_DIRECT](X9_DIRECT.md)记录历史0.4绑定版。以下 `sender` 特指保留的电脑收包台架应用；其10秒窗口不适用于新直连应用。
 
 单链路真实SDK发送版是独立 `sender` APK；电脑收包/回显工具、固定依赖、配置、构建和未验收边界见 [SERIAL_BENCH](SERIAL_BENCH.md)。`scripts/test.*`现同时运行原core、只读输入会话和sender-core断言。真实SDK发送版与原模拟/只读包分开检查，未执行安装或硬件发送。
 

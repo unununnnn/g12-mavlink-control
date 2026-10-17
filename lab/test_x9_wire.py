@@ -8,6 +8,18 @@ from pymavlink.dialects.v10 import common as v1
 
 
 class DirectWireTests(unittest.TestCase):
+    def test_all_raw_channels_match_independent_encoder(self):
+        packets = json.loads(Path('artifacts/channel-vectors.json').read_text())
+        for i, count in enumerate((16, 18, 8)):
+            dialect = v1 if i == 2 else v2
+            values = [1050+(c*47)%901 for c in range(count)] + [65535]*((8 if i == 2 else 18)-count)
+            writer = dialect.MAVLink(None, srcSystem=245, srcComponent=191); writer.seq = 30+i
+            packet = bytes.fromhex(packets[i])
+            expected = dialect.MAVLink_rc_channels_override_message(7, 1, *values).pack(writer)
+            self.assertEqual(packet, expected)
+            decoded = dialect.MAVLink(None).parse_buffer(packet)[0]
+            self.assertEqual([getattr(decoded, f'chan{n+1}_raw') for n in range(count)], values[:count])
+
     def test_incoming_version_fixture_is_independent(self):
         source = Path('x9-core/src/test/java/com/g12/x9core/DirectTests.java').read_text(encoding='utf-8')
         packet = bytes.fromhex(re.search(r'VERSION_FIXTURE="([0-9a-f]+)"', source)[1])

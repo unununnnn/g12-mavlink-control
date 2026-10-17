@@ -12,7 +12,7 @@ bt = Path(os.environ['ANDROID_HOME']) / 'build-tools' / '35.0.0'
 def run(*args):
     return subprocess.check_output([str(a) for a in args], text=True)
 badging = run(bt/'aapt', 'dump', 'badging', apk)
-for field in ("name='com.g12.x9'", "versionCode='4'", "versionName='0.4.0-x9-direct'", "sdkVersion:'33'", "targetSdkVersion:'33'"):
+for field in ("name='com.g12.x9'", "versionCode='5'", "versionName='0.5.0-x9-direct'", "sdkVersion:'33'", "targetSdkVersion:'33'"):
     assert field in badging, field
 permissions = run(bt/'aapt', 'dump', 'permissions', apk)
 assert [s for s in permissions.splitlines() if s.startswith('uses-permission:')] == ["uses-permission: name='android.permission.INTERNET'"]
@@ -25,17 +25,17 @@ with zipfile.ZipFile(aar) as vendor, zipfile.ZipFile(apk) as app:
     for name in native:
         assert vendor.read(name) == app.read(name.replace('jni/', 'lib/', 1)), name
     dex = b''.join(app.read(n) for n in app.namelist() if n.endswith('.dex'))
-    for name in (b'Lcom/skydroid/rcsdk/PipelineManager;', b'Lcom/g12/x9/SdkLink;', b'Lcom/g12/x9core/DirectSession;', b'Lcom/g12/x9core/ProfileCodec;', b'Lcom/g12/bench/RetainedReadBackend;'):
+    for name in (b'Lcom/skydroid/rcsdk/PipelineManager;', b'Lcom/g12/x9/SdkLink;', b'Lcom/g12/x9core/ChannelSession;', b'Lcom/g12/bench/RetainedReadBackend;'):
         assert name in dex, name
-    for name in (b'Lcom/g12/core/ControlSession;', b'Lcom/g12/sendercore/SendEngine;', b'Lcom/g12/simulator/'):
+    for name in (b'Lcom/g12/core/ControlSession;', b'Lcom/g12/sendercore/SendEngine;', b'Lcom/g12/simulator/', b'Lcom/g12/x9/ProfileStore;'):
         assert name not in dex, name
 classes = Path('x9/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes')
 own = sorted(str(p.relative_to(classes)).replace(os.sep, '.').removesuffix('.class') for p in classes.rglob('*.class'))
 assert own
 code = run('javap', '-classpath', classes, '-c', '-p', *own)
-for forbidden in ('KeyManager.set:', 'KeyManager.action:', 'PayloadManager', 'UpgradeManager', 'java/net/', 'java/lang/Runtime.exec', 'ProcessBuilder'):
+for forbidden in ('KeyManager.set:', 'KeyManager.action:', 'PayloadManager', 'UpgradeManager', 'java/net/', 'java/lang/Runtime.exec', 'ProcessBuilder', 'ProfileCodec', 'ProfileStore', 'Calibration', 'SharedPreferences'):
     assert forbidden not in code, forbidden
-for required in ('createG12G20Pipeline', 'connectPipeline', 'disconnectPipeline', 'writeData', 'getKeyChannels', '/system/bin/data_stream', 'ReadOnlySession.pause', 'DirectSession.connect', 'ProfileCodec'):
+for required in ('createG12G20Pipeline', 'connectPipeline', 'disconnectPipeline', 'writeData', 'getKeyChannels', '/system/bin/data_stream', 'ReadOnlySession.pause', 'ChannelSession.connect'):
     assert required in code, required
 report = {
     'commit': os.environ.get('GITHUB_SHA', run('git', 'rev-parse', 'HEAD').strip()),
@@ -44,7 +44,12 @@ report = {
     'signature_verified': True, 'zip_alignment_verified': True, 'only_permission': 'INTERNET',
     'actual_sdk_pipeline_linked': True, 'foreground_read_connection_retained': True,
     'no_app_parameter_arm_mode_or_upgrade_calls': True,
-    'default_sending': False, 'activation': 'bound identity/configuration, fresh inputs, physical OFF then ON',
+    'default_sending': False, 'activation': 'user clicks connect, automatic heartbeat/source discovery, fresh inputs',
+    'first_run_setup': False, 'saved_profile_or_binding': False, 'uid_or_firmware_version_required': False,
+    'channel_mapping': 'SDK index + 1 to same RC channel, including auxiliary switches, no scaling/reversal',
+    'maximum_channels': 18, 'mavlink1_maximum_channels': 8, 'silent_truncation': False,
+    'verified_copter_4_7_1_adoption_channels': 16, 'feedback_check_max_channels': 16,
+    'auxiliary_controls_may_trigger_configured_actions': True,
     'total_duration_limit_ms': None, 'armed_state_gate': False, 'max_rate_hz': 10,
     'local_input_timeout_ms': 250, 'sdk_write_timeout_ms': 200, 'telemetry_timeout_ms': 3000,
     'parameter_writes': False, 'periodic_gcs_heartbeat': False, 'automatic_release': False,

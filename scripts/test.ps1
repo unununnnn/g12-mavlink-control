@@ -28,4 +28,6 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'X9 javac failed' }
     & $java -cp artifacts/classes com.g12.x9core.DirectTests
     if ($LASTEXITCODE -ne 0) { throw 'X9 regression failed' }
+    & $java -cp artifacts/classes com.g12.x9core.ChannelTests
+    if ($LASTEXITCODE -ne 0) { throw 'Raw channel regression failed' }
 } finally { Pop-Location }

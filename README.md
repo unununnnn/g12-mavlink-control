@@ -1,8 +1,8 @@
 # G12 MAVLink Control
 
-**当前开发交付：G12 X9直连 0.4.0。** 独立 `x9` 应用首次引导校准四轴/接管开关、录入实际透传波特率并绑定X9；以后只需连接，物理开关请求/退出持续传输。按用户确认取消总时长和解锁状态限制，保留输入/链路时效与故障停发。真实SDK集成，尚未完成G12/GR00/X9真机或飞行验收。见[直连说明与复现](docs/X9_DIRECT.md)。
+**当前开发交付：G12 通道直传 0.5.0。** 已取消首次设置、校准和X9绑定。点击连接后自动识别飞控，把SDK返回的全部通道（含辅助开关）按原值、原顺序通过MAVLink发送；无需保存档案或指定接管开关。无总时长及解锁状态限制，保留输入/链路失效停发。见[全通道直传说明](docs/CHANNELS.md)。尚未完成真机或飞行验收。
 
-[下载直连APK](https://github.com/unununnnn/g12-mavlink-control/releases/download/v0.4.0-x9-direct/g12-x9-direct-0.4.0.apk) · [预发布与校验报告](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.4.0-x9-direct)。源码 `8473c44`，CI与隔离SITL通过；本项目私有，下载需对应GitHub访问权限。
+[下载0.5.0 APK](https://github.com/unununnnn/g12-mavlink-control/releases/download/v0.5.0-x9-direct/g12-x9-direct-0.5.0.apk) · [预发布与校验报告](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.5.0-x9-direct)。本项目私有，下载需对应GitHub访问权限。MAVLink2可编码18通道；固定Copter4.7.1接收实现仅采用前16通道，App明确区分发送与接收采用。
 
 **启停修复候选版：sender 0.3.1 / readonly 0.2.1。** 用户定位到“停止后再次读取出现 SDK code=101 timeout”。前台停止采集现在保留 SDK 连接，恢复时等旧请求结束后发起新 GET；释放端口和后台仍完整断开。软件回归通过，G12 实测待确认。见[启停修复与复测步骤](docs/RESTART_FIX.md)。
 
@@ -14,7 +14,7 @@ G12 Android 应用与**隔离 SITL 开发项目**，目标为云卓 SDK 读取�
 
 ## 交付内容
 
-- `x9` / `x9-core`: G12直连X9应用、首次设置/持久化档案、只读身份和配置核对、持续四轴传输、启停/故障测试。
+- `x9` / `x9-core`: G12全通道原值直传、一键连接、自动目标/接收配置识别及启停/故障测试；保留0.4历史核心回归，当前App不再使用绑定档案。
 - `core`: 无 Android 依赖的 Java 协议、流解析、目标识别及模拟接管状态机。
 - `app`: Android 原生界面，显式启动模拟、模拟接管、冻结输入、交还与生命周期停止；无网络/串口权限。
 - `bench` / `bench-core`: 官方SDK只读Android应用、异步会话契约与故障回归；无飞控数传管道或控制core依赖。
