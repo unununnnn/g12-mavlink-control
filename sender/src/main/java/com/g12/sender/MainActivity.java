@@ -117,7 +117,8 @@ public final class MainActivity extends Activity {
         Mapping next=new Mapping(message.getSelectedItemPosition()==1?Mapping.Message.MANUAL_CONTROL:Mapping.Message.RC_CHANNELS_OVERRIDE,
                 number(src),number(srcComp),number(dst),number(dstComp),number(baud),number(rate),axes);
         if(input.state()!=ReadOnlySession.State.READING || input.stale())throw new IllegalStateException("先取得近期真实原始通道");
-        int[] preview=next.values(input.channels());mapping=next;decision="配置已确认。ROLL/PITCH/THROTTLE/YAW="+Arrays.toString(preview)+"；请检查方向。";
+        int[] preview=next.values(input.channels());mapping=next;decision="配置已确认："+next.message+"，源="+next.sourceSystem+"/"+next.sourceComponent
+                +"，目标="+next.targetSystem+"/"+next.targetComponent+"，UART="+next.baud+"，"+next.rateHz+"Hz。ROLL/PITCH/THROTTLE/YAW="+Arrays.toString(preview)+"；请检查方向。";
     }
     private void openLink(){
         if(mapping==null || input.state()!=ReadOnlySession.State.READING || !isolated.isChecked() || !firmware.isChecked())throw new IllegalStateException("须确认映射、电脑隔离、厂商系统构建，并保持输入连接");
@@ -132,7 +133,9 @@ public final class MainActivity extends Activity {
                 +"\n映射 R/P/T/Y: "+preview+"\n管道: "+(link==null?"未打开":link.status())
                 +"\n发送状态: "+engine.state()+" / "+engine.status()+"\n提交帧="+engine.offered()+" SDK调用返回="+engine.sdkReturns()+" 电脑回显="+engine.echoed()
                 +"\n飞控接受：未验证；双链路排他：未部署");
-        if(note!=null)note.setText(decision);
+        // Keep live feedback next to the send/stop controls after scrolling through the configuration form.
+        if(note!=null)note.setText(decision+"\n"+engine.state()+"："+engine.status()+"\nSDK返回="+engine.sdkReturns()+" / 电脑回显="+engine.echoed()
+                +"\n当前映射 R/P/T/Y="+preview+"；回调年龄="+input.age()+"ms");
     }
     @Override protected void onResume(){super.onResume();main.post(uiTick);guard=watchdog.scheduleAtFixedRate(()->{try{engine.tick();}catch(RuntimeException e){engine.stop("发送监视异常");}},0,25,TimeUnit.MILLISECONDS);}
     @Override protected void onPause(){main.removeCallbacks(uiTick);if(guard!=null)guard.cancel(false);stopLink("后台/锁屏：停止，不自动恢复");input.stop("已离开前台");forwarded=-1;super.onPause();}
