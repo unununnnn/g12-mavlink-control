@@ -1,0 +1,253 @@
+{
+  "started_utc": "2026-10-17T07:52:13.624500+00:00",
+  "cases": [
+    {
+      "name": "owned_stock_identity_disarmed",
+      "result": "PASS",
+      "revision": "dbe792162d06cab66c3475fd5556bf7a120f119e",
+      "flight_sw_version": 67568127
+    },
+    {
+      "name": "java_manual_control_received",
+      "result": "PASS",
+      "rc_channels": [
+        2000,
+        2000,
+        1500,
+        1375
+      ]
+    },
+    {
+      "name": "java_release_returns_primary_axes",
+      "result": "PASS",
+      "rc_channels": [
+        1450,
+        1550,
+        1000,
+        1500
+      ]
+    },
+    {
+      "name": "wrong_target_rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong_gcs_sysid_rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "second_serial_same_sysid_can_replace_control",
+      "result": "PASS",
+      "consequence": "sysid is not exclusive ownership or authentication"
+    },
+    {
+      "name": "override_ignore_and_extension_release",
+      "result": "PASS",
+      "base_release": 0,
+      "extension_release": 65534,
+      "extension_zero": "ignore"
+    },
+    {
+      "name": "default_override_timeout",
+      "result": "PASS",
+      "observed_wall_seconds": 3.004,
+      "parameter_seconds": 3.0
+    },
+    {
+      "name": "primary_rc_no_pulses_sets_unhealthy",
+      "result": "PASS",
+      "fault": "SIM_RC_FAIL=1; simulated receiver input, not electrical SBUS"
+    },
+    {
+      "name": "valid_override_stream_masks_primary_rc_failure",
+      "result": "PASS",
+      "sim_rc_fail": 1,
+      "rc_health_bit": true,
+      "consequence": "SYS_STATUS and overridden RC_CHANNELS cannot prove physical primary recovery"
+    },
+    {
+      "name": "release_during_primary_failure_does_not_restore_health",
+      "result": "PASS"
+    },
+    {
+      "name": "primary_restored_after_fault_removed",
+      "result": "PASS"
+    },
+    {
+      "name": "primary_protocol_failsafe_flag_sets_unhealthy",
+      "result": "PASS",
+      "sim_rc_fail": 3
+    },
+    {
+      "name": "arbiter_to_sitl_owner_exclusion_and_stale_stop",
+      "result": "PASS",
+      "forwarded_before_stop": 2,
+      "input_timeout_threshold_ms": 150,
+      "fc_retains_last_override_seconds": 3.0
+    },
+    {
+      "name": "arbiter_explicit_hand_back_without_reacquisition",
+      "result": "PASS"
+    },
+    {
+      "name": "safety_parameters_unchanged_and_disarmed",
+      "result": "PASS"
+    }
+  ],
+  "scope": "disarmed stock SITL; no physical G12/GR00/X9 verification",
+  "pymavlink": "2.4.49",
+  "test_runner_sha256": "d2eebf3530f41da6ecd3498a528df03fb3f8195d31b0f08c6a0e7a2d10ab3a08",
+  "arbiter_sha256": "d65a03629e1ab05d26477dae8ea4c3f797fb94071a2815f77e6f13559998e6b2",
+  "project_head": "979361da4a5a19524c2573041ea9dd1fb3f804f4",
+  "build": {
+    "revision": "dbe792162d06cab66c3475fd5556bf7a120f119e",
+    "binary_sha256": "6ea99f2e9b33bc57e4a74a37c6064c166af31efa1ff90f51354f79a606b1ad22",
+    "dialect_sha256": "d0005933771688f584007bac24c11ee39c0f2b1df91809aea3820bcc24cb6e74",
+    "submodules": "-d103983f4362e5506bcf7062ccacf345fc0c0859 modules/ChibiOS\n-599965086437137ec0fe66e185611f43f335f889 modules/CrashDebug\n 04e0e818b06c180eb1720fcdf16484d0f12895ee modules/DroneCAN/DSDL (04e0e81)\n de47a8972b7d8c59e50c3acfab5754db29798caa modules/DroneCAN/dronecan_dsdlc (de47a89)\n 601ed35467e0ac38819df17cd7c918de19f62d58 modules/DroneCAN/libcanard (heads/master)\n 9c6bc9118de66d6edaf1b8539e2b9717ba26d123 modules/DroneCAN/libcanard/drivers/avr/avr-can-lib (heads/master)\n 08cda37aaf2958657399606653b99ceb5a6beae0 modules/DroneCAN/pydronecan (08cda37)\n-3d1b17703c7cf4f22def2910bc845bdb5152d7b5 modules/Micro-CDR\n-97175304425c5bee87c6fddd99de1ef8d0c394dc modules/Micro-XRCE-DDS-Client\n-d572f4777349d43653b21d6c2fc63020ab326db2 modules/gbenchmark\n-e1f690585d4803402584962bfaa8240ecaf1db30 modules/gsoap\n c5fed93f941865a0e912e9baf46ded713506590a modules/gtest (c5fed93)\n 34be692aafaaf4319a18e415b08aa4332697408b modules/littlefs (34be692)\n a6bf350c679ed8ba042ad58bf81cc540d61bb605 modules/lwip (a6bf350)\n 288b907c384a892c8519bfe271682424b1e1a3a0 modules/mavlink (288b907)\n ec06837a50688b5974094876c3c9d1b8bf86629d modules/mavlink/pymavlink (ec06837)\n 35eadbb64e2052099a853b571e507c33032b392c modules/waf (heads/master)\n",
+    "compiler": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+    "configure": "./waf configure --board sitl --no-submodule-update",
+    "build": "./waf copter"
+  },
+  "initial_defaults": "FRAME_CLASS 1\nSERIAL0_PROTOCOL 2\nSERIAL1_PROTOCOL 2\nRC1_MIN 1000\nRC1_MAX 2000\nRC1_TRIM 1500\nRC2_MIN 1000\nRC2_MAX 2000\nRC2_TRIM 1500\nRC3_MIN 1000\nRC3_MAX 2000\nRC3_TRIM 1500\nRC4_MIN 1000\nRC4_MAX 2000\nRC4_TRIM 1500\n",
+  "command": [
+    "/root/g12-sitl-4.7.1/build/sitl/bin/arducopter",
+    "--model",
+    "+",
+    "--speedup",
+    "1",
+    "--home",
+    "35.0,139.0,10,0",
+    "--defaults",
+    "/tmp/g12-owned-sitl-94g_id9f/lab.parm",
+    "--rc-in-port",
+    "60566",
+    "--serial0",
+    "tcpclient:127.0.0.1:44521",
+    "--serial1",
+    "tcpclient:127.0.0.1:60657",
+    "--serial2",
+    "none",
+    "--serial3",
+    "none",
+    "--serial4",
+    "none",
+    "--serial5",
+    "none",
+    "--serial6",
+    "none",
+    "--serial7",
+    "none",
+    "--serial8",
+    "none"
+  ],
+  "autopilot_version": {
+    "mavpackettype": "AUTOPILOT_VERSION",
+    "capabilities": 64495,
+    "flight_sw_version": 67568127,
+    "middleware_sw_version": 0,
+    "os_sw_version": 0,
+    "board_version": 0,
+    "flight_custom_version": [
+      100,
+      98,
+      101,
+      55,
+      57,
+      50,
+      49,
+      54
+    ],
+    "middleware_custom_version": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "os_custom_version": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "vendor_id": 0,
+    "product_id": 0,
+    "uid": 0,
+    "uid2": [
+      97,
+      102,
+      55,
+      52,
+      101,
+      97,
+      55,
+      99,
+      98,
+      52,
+      48,
+      99,
+      52,
+      53,
+      48,
+      49,
+      97,
+      0
+    ]
+  },
+  "safety_before": {
+    "ARMING_SKIPCHK": 0.0,
+    "FS_THR_ENABLE": 1.0,
+    "FS_GCS_ENABLE": 0.0,
+    "FS_OPTIONS": 16.0,
+    "FENCE_ENABLE": 0.0,
+    "FENCE_ACTION": 1.0,
+    "RC_OVERRIDE_TIME": 3.0,
+    "RC_FS_TIMEOUT": 1.0,
+    "RC_OPTIONS": 32.0,
+    "MAV_GCS_SYSID": 255.0,
+    "MAV_GCS_SYSID_HI": 0.0,
+    "SIM_RC_FAIL": 0.0
+  },
+  "java_vectors_sha256": "d26c240b63d175db32661025f8778c2b639dd654f0b65fbd9243718a20ac9a84",
+  "safety_after": {
+    "ARMING_SKIPCHK": 0.0,
+    "FS_THR_ENABLE": 1.0,
+    "FS_GCS_ENABLE": 0.0,
+    "FS_OPTIONS": 16.0,
+    "FENCE_ENABLE": 0.0,
+    "FENCE_ACTION": 1.0,
+    "RC_OVERRIDE_TIME": 3.0,
+    "RC_FS_TIMEOUT": 1.0,
+    "RC_OPTIONS": 32.0,
+    "MAV_GCS_SYSID": 255.0,
+    "MAV_GCS_SYSID_HI": 0.0,
+    "SIM_RC_FAIL": 0.0
+  },
+  "result": "PASS",
+  "status_text": [
+    "Barometer 1 calibration complete",
+    "Barometer 2 calibration complete",
+    "ArduPilot Ready",
+    "AHRS: DCM active",
+    "EKF3 IMU0 initialised",
+    "EKF3 IMU1 initialised",
+    "AHRS: EKF3 active",
+    "EKF3 IMU0 tilt alignment complete",
+    "EKF3 IMU1 tilt alignment complete",
+    "EKF3 IMU0 MAG0 initial yaw alignment complete",
+    "EKF3 IMU1 MAG0 initial yaw alignment complete",
+    "Radio Failsafe - Disarming",
+    "Radio Failsafe Cleared",
+    "Radio Failsafe - Disarming",
+    "Radio Failsafe Cleared",
+    "Radio Failsafe - Disarming",
+    "Radio Failsafe Cleared"
+  ]
+}

@@ -57,3 +57,7 @@ python -m unittest lab.test_arbiter -v
 安全参数前后完全一致：ARMING_SKIPCHK=0、FS_THR_ENABLE=1、FS_GCS_ENABLE=0、FS_OPTIONS=16、FENCE_ENABLE=0、FENCE_ACTION=1、RC_OVERRIDE_TIME=3、RC_FS_TIMEOUT=1、RC_OPTIONS=32、MAV_GCS_SYSID=255、MAV_GCS_SYSID_HI=0、SIM_RC_FAIL最终恢复0。这是全新stock SITL默认配置，**不代表用户X9配置；没有验证启用围栏/GCS failsafe后的飞行动作**。全过程心跳检查保持disarmed；主输入是模拟UDP PWM，未验证SBUS电气或真实射频。
 
 本地原始报告 `artifacts/sitl/report.json` 和运行日志 `sitl.log` 包含实际构建、schema及脚本SHA256。该次运行在979361d之后的修正工作树进行，报告project_head是父提交，脚本哈希标识实际运行文件；后续CI按完整提交验证。二进制SHA256为 `6ea99f2e9b33bc57e4a74a37c6064c166af31efa1ff90f51354f79a606b1ad22`。可复现步骤、固定版本差异和限制见[SITL.md](SITL.md)。
+
+已将未改写的本地报告归档为 [local-sitl-20261017.json](evidence/local-sitl-20261017.json)，并核对其测试脚本SHA256与提交 `7b57035cddebd0da1af5bd4c95d0f0a10402f470` 中的文件字节一致。该代码提交的完整CI复核为 [39015334397](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39015334397)，远端状态和artifact以该运行页为准。随后只归档文档/JSON证据的提交不重复触发编译；没有更改被测代码。
+
+现有dot项目还保存了《SITL 与仲裁验证交接（2026-10-17）》文本来源，内容已打开预览核对，包含代码提交、CI链接、实测发现与下一阶段阻塞。项目资料是交接上下文，不代表本地Git目录后台同步。
