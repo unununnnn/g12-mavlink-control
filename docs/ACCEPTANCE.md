@@ -11,6 +11,7 @@
 - [x] Android模拟APK编译及lint通过：[CI39013291734](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39013291734)。
 - [x] dot/ChatGPT项目已创建，仓库交接来源已保存；现有GitHub连接器成功读取新私有仓库，未新增授权。不是后台自动同步保证。
 - [x] RCSDK1.9.2真实类型核对并接入独立bench应用；21项异步采集契约断言；未在G12执行厂商SDK。
+- [x] 真正SDK Android13只读APK构建、lint、SDK/原生库/权限/签名及调用边界检查通过：[CI39023451442](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39023451442)，哈希见[验证记录](VALIDATION.md)。
 - [x] 固定Copter4.7.1独立源码构建；本地16项disarmed SITL用例通过，含真实Java字节接收、覆盖超时、两类主RC失效、释放、恢复和仲裁输出。详见[验证记录](VALIDATION.md)。
 - [x] 单写者仲裁原型及8项回归，包含两个独立OS进程、独立临时密钥、旧租约/重放、故障锁存与禁止自动重取。
 

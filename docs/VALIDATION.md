@@ -1,5 +1,17 @@
 # 本地验证记录
 
+## 官方 SDK Android13 只读 APK — 2026-10-17
+
+构建提交 `4780fae73d44716121ca4e504f04779e1ba1fceb`，[CI39023451442](https://github.com/unununnnn/g12-mavlink-control/actions/runs/39023451442) success。真正包含官方 RCSDK1.9.2，包名 `com.g12.bench.readonly`，目标 Android13/API33，min23，ARMv7和ARM64。APK `g12-sdk-readonly-0.2.0.apk`，3,231,035字节；SHA256 `259541b12cd22488ca01084b1632c6454249add1fed7db0f7ee43a863bbe9722`，下载后本机再次核对一致。[机器可读证据](evidence/sdk-bench-20261017.json)。[私有预发布下载](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.2.0-sdk-readonly)。
+
+通过597项原核心断言、21项异步只读会话断言、8项仲裁测试；Android构建及lint通过（0错误，8警告：备份规则、图标、中文动态文本国际化）。原生库14/14与固定官方AAR字节一致；DEX存在实际SDK和Kotlin运行库，未包含模拟或控制core；本项目字节码无数传管道、writeData、KeyManager.set/action、升级或直接网络调用。仅INTERNET权限；APK v1/v2签名有效，ZIP对齐检查返回0。测试证书SHA256 `bf2fd5b9e5fdb414009dec725f7de64d7ec43421cd7010b125b981206f0ba892`；签名私钥未交付。
+
+首次CI39023291475的编译与lint通过，但检查脚本对zipalign成功文本的断言失败；已改为检查工具退出码并保存输出，重新完整构建及检查通过。不是硬件/SDK故障。
+
+CI artifact `g12-sdk-readonly-android13`，id `12097805677`，ZIP digest `sha256:905d7dfefdd172e03951d1a141826a3a92779c9fc0391ba86522f2fbfa4190f5`，过期日期2026-11-16。本地保存在 `artifacts/ci-39023451442-bench/` 和 `artifacts/release-readonly/`。本段是实际SDK包的构建证据，后文旧小体积APK仍是模拟包。
+
+未安装、未运行G12 SDK、未连接真实飞控、未解锁/刷写/飞行。真实通道/链路读取已实现，硬件行为仍须用户只读台架验收；它不是完整MAVLink遥控版。真实源端新鲜度、跨设备排他及失联/交还的硬件验证仍阻塞完整控制。详见[SDK_BENCH](SDK_BENCH.md)。
+
 2026-10-17 UTC，Windows PC。
 
 命令：`$env:JAVA_HOME='D:\install\stmcube\jre'; ./scripts/test.ps1`；实际运行 Temurin21.0.3，`javac --release 17 -Xlint:all -Werror`。

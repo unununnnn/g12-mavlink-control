@@ -1,0 +1,20 @@
+{
+  "commit": "4780fae73d44716121ca4e504f04779e1ba1fceb",
+  "apk": "g12-sdk-readonly-0.2.0.apk",
+  "apk_sha256": "259541b12cd22488ca01084b1632c6454249add1fed7db0f7ee43a863bbe9722",
+  "apk_bytes": 3231035,
+  "sdk_sha256": "e5977ba3292246bcee026defdb8563a18adc9d5573fdfb20a6880ee469f0fde2",
+  "target_android": "13 / API 33",
+  "native_libraries_verified": 14,
+  "permissions": [
+    "uses-permission: name='android.permission.INTERNET'"
+  ],
+  "sdk_classes_present": true,
+  "kotlin_runtime_present": true,
+  "own_bytecode_readonly_boundary": "PASS",
+  "simulation_and_control_core_absent": true,
+  "apk_signature_verified": true,
+  "zip_alignment_verified": true,
+  "hardware_tested": false,
+  "flight_control_send_enabled": false
+}
