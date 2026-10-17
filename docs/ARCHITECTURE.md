@@ -7,11 +7,14 @@
 G12 Android -> 云卓 SDK -> GR00 备用数传 --串口<-> X9 MAVLink
 
 当前可执行:
+真实通道/链路 -> RCSDK1.9.2 -> bench只读会话 -> 本机显示（待G12运行验收）
 模拟输入 -> ControlSession -> MAVLink MANUAL_CONTROL -> SimulationLink(内存)
 模拟 HEARTBEAT + AUTOPILOT_VERSION -> 目标校验 -> 模拟会话
 ```
 
 `core` 与 Android 解耦。SDK 契约是本项目自有接口，不是厂商 API。Android/core仅内置内存输出；硬件工厂始终拒绝创建。公开控制入口不提供任意字节发送。独立 `lab` 目录新增进程外SITL实验，具备独立network namespace和自启动子进程限制，不接入APK。
+
+独立 `bench` 包只依赖官方SDK、Kotlin运行库和 `bench-core`，不依赖控制 `core`。其状态为IDLE/CONNECTING/READING/STOPPED；仅手动开始建立SDK连接。退出前台、请求超时或SDK断开即清空并停止，禁止自动恢复。接收机链路LISTEN与原始通道GET分开计龄；没有飞控传输管道，见[只读边界](SDK_BENCH.md)。
 
 状态：READ_ONLY -> SIMULATION_READY -> ACTIVE -> HANDING_BACK -> SIMULATION_READY；任何失联、输入过期、时钟回退、写入异常或目标冲突 -> STOPPED。STOPPED 无自动恢复，必须显式新开模拟会话，清空输入和身份信息。`onPause` 停止并清空，不在后台维持控制。
 

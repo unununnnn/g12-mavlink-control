@@ -1,5 +1,7 @@
 # 构建、测试与复现
 
+真正集成官方SDK的Android13 G12台架包使用独立 `bench` 模块；构建命令、固定AAR哈希、只读边界、兼容性和用户验收步骤见 [SDK_BENCH](SDK_BENCH.md)。下文 `app` / `g12-simulation-debug` 仍仅指旧模拟包。
+
 ## 核心离线回归
 
 要求 JDK17+。PowerShell 设置 JAVA_HOME 后运行 `./scripts/test.ps1`；Linux/macOS 运行 `bash scripts/test.sh`。脚本用 `--release 17 -Xlint:all -Werror` 编译实际 core 和测试源码。输出 `artifacts/vectors.json`。不使用 Android、Gradle、串口或网络。

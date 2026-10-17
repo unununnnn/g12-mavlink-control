@@ -25,7 +25,7 @@ permission_lines = [x for x in permissions.splitlines() if x.startswith('uses-pe
 assert permission_lines == ["uses-permission: name='android.permission.INTERNET'"], permissions
 signing = run(build_tools / 'apksigner', 'verify', '--verbose', '--print-certs', apk)
 aligned = run(build_tools / 'zipalign', '-c', '-P', '16', '-v', '4', apk)
-assert 'Verification successful' in aligned
+# check_output already rejects nonzero exit; zipalign's success text is not a stable API.
 with zipfile.ZipFile(aar) as vendor, zipfile.ZipFile(apk) as app:
     native = [n for n in vendor.namelist() if n.startswith('jni/') and n.endswith('.so')]
     assert len(native) == 14
@@ -59,5 +59,6 @@ out = Path('artifacts/bench'); out.mkdir(parents=True, exist_ok=True)
 (out / 'apk-verification.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 (out / 'apk-badging.txt').write_text(badging, encoding='utf-8')
 (out / 'apk-signature.txt').write_text(signing, encoding='utf-8')
+(out / 'apk-alignment.txt').write_text(aligned, encoding='utf-8')
 (out / 'SHA256SUMS.txt').write_text(f"{report['apk_sha256']}  {apk.name}\n", encoding='utf-8')
 print(json.dumps(report, indent=2))
