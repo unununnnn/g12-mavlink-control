@@ -23,4 +23,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Sender javac failed' }
     & $java -cp artifacts/classes com.g12.sendercore.SenderTests
     if ($LASTEXITCODE -ne 0) { throw 'Sender regression failed' }
+    $directSources = @(Get-ChildItem x9-core/src -Recurse -Filter '*.java' | ForEach-Object FullName)
+    & $javac --release 17 -Xlint:all -Werror -encoding UTF-8 -d artifacts/classes @directSources
+    if ($LASTEXITCODE -ne 0) { throw 'X9 javac failed' }
+    & $java -cp artifacts/classes com.g12.x9core.DirectTests
+    if ($LASTEXITCODE -ne 0) { throw 'X9 regression failed' }
 } finally { Pop-Location }

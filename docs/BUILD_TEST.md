@@ -1,5 +1,7 @@
 # 构建、测试与复现
 
+直连X9版本使用 `x9` / `x9-core`，构建命令及回归入口见 [X9_DIRECT](X9_DIRECT.md)。以下 `sender` 特指保留的电脑收包台架应用；其10秒窗口不适用于新直连应用。
+
 单链路真实SDK发送版是独立 `sender` APK；电脑收包/回显工具、固定依赖、配置、构建和未验收边界见 [SERIAL_BENCH](SERIAL_BENCH.md)。`scripts/test.*`现同时运行原core、只读输入会话和sender-core断言。真实SDK发送版与原模拟/只读包分开检查，未执行安装或硬件发送。
 
 真正集成官方SDK的Android13 G12台架包使用独立 `bench` 模块；构建命令、固定AAR哈希、只读边界、兼容性和用户验收步骤见 [SDK_BENCH](SDK_BENCH.md)。下文 `app` / `g12-simulation-debug` 仍仅指旧模拟包。

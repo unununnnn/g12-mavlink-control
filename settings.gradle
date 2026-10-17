@@ -4,5 +4,7 @@ rootProject.name = 'g12-mavlink-control'
 include ':core', ':app'
 include ':bench-core'
 include ':sender-core'
+include ':x9-core'
 if (providers.gradleProperty('withSkydroid').orNull == 'true') { include ':bench' }
 if (providers.gradleProperty('withSkydroid').orNull == 'true') { include ':sender' }
+if (providers.gradleProperty('withSkydroid').orNull == 'true') { include ':x9' }

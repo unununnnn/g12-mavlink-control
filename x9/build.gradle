@@ -1,0 +1,14 @@
+plugins { id 'com.android.application' }
+def sdkFile=file(providers.gradleProperty('skydroidAar').orElse('../vendor/rcsdk-v1.9.2.aar').get())
+if(!sdkFile.isFile() || java.security.MessageDigest.getInstance('SHA-256').digest(sdkFile.bytes).encodeHex().toString()!='e5977ba3292246bcee026defdb8563a18adc9d5573fdfb20a6880ee469f0fde2')throw new GradleException('Pinned official RCSDK1.9.2 AAR required')
+android {
+    namespace 'com.g12.x9'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+    defaultConfig { applicationId 'com.g12.x9'; minSdk 33; targetSdk 33; versionCode 4; versionName '0.4.0-x9-direct'; ndk { abiFilters 'armeabi-v7a','arm64-v8a' } }
+    sourceSets.main.java { srcDir '../bench/src/main/java'; exclude 'com/g12/bench/MainActivity.java','com/g12/bench/BenchApplication.java' }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    packaging { jniLibs { keepDebugSymbols += ['**/*.so'] } }
+    lint { abortOnError true; disable 'ExpiredTargetSdkVersion','OldTargetApi' }
+}
+dependencies { implementation project(':x9-core'); implementation project(':bench-core'); implementation files(sdkFile); implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10' }

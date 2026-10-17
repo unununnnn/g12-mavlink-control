@@ -74,7 +74,7 @@ public final class MainActivity extends Activity {
         src=field(body,"发送者 sysid 1..255");srcComp=field(body,"发送者 compid 1..255");
         dst=field(body,"目标 sysid 1..255");dstComp=field(body,"目标 compid 1..255");
         text(body,"MANUAL_CONTROL只有target system字段，不携带target component；该模式的compid仅记录，不能定位某组件。RC覆盖模式同时携带两者。",14);
-        baud=field(body,"GR00 UART0与电脑已核对波特率（本App不修改）");rate=field(body,"发送频率1..10Hz；低波特率需降频");
+        baud=field(body,"GR00透传口与电脑已核对波特率（本App不修改）");rate=field(body,"发送频率1..10Hz；低波特率需降频");
         String[] roles={"ROLL 横滚","PITCH 俯仰","THROTTLE 油门","YAW 偏航"};
         for(int i=0;i<4;i++){
             text(body,roles[i],18);

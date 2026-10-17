@@ -1,0 +1,49 @@
+name: Build G12 X9 direct APK
+on: [workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  x9:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Verify existing Android tools and fetch pinned official SDK
+        run: |
+          test -f "$ANDROID_HOME/platforms/android-35/android.jar"
+          test -d "$ANDROID_HOME/build-tools/35.0.0"
+          bash scripts/fetch_skydroid.sh
+      - name: Install pinned test decoder on disposable runner
+        run: python -m pip install -r lab/serial-requirements.txt
+      - name: Run lifecycle, direct control and independent wire tests
+        run: |
+          mkdir -p artifacts/x9
+          bash scripts/test.sh | tee artifacts/x9/java-tests.txt
+          python -m unittest lab.test_serial_echo lab.test_arbiter lab.test_x9_wire -v 2>&1 | tee artifacts/x9/python-tests.txt
+      - name: Build and lint direct app
+        run: gradle --no-daemon -PwithSkydroid=true :x9-core:check :x9:assembleDebug :x9:lintDebug
+      - name: Inspect actual APK
+        run: |
+          cp x9/build/outputs/apk/debug/x9-debug.apk artifacts/x9/g12-x9-direct-0.4.0.apk
+          python scripts/verify_x9.py artifacts/x9/g12-x9-direct-0.4.0.apk vendor/rcsdk-v1.9.2.aar
+          cp docs/X9_DIRECT.md artifacts/x9/
+          cp artifacts/x9-vectors.json artifacts/x9/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g12-x9-direct-android13
+          path: |
+            artifacts/x9/
+            x9/build/reports/lint-results-debug.html
+            x9/build/reports/lint-results-debug.xml
+          if-no-files-found: error
+          retention-days: 30
