@@ -6,6 +6,7 @@ Only SIM_RC_FAIL may be written. No arm, mode, mission, or heartbeat is sent.
 import argparse
 import hashlib
 import importlib.metadata
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -42,7 +43,10 @@ class Experiment:
         self.source, self.output = source, output
         self.report = {"started_utc": datetime.now(timezone.utc).isoformat(), "cases": [],
                        "scope": "disarmed stock SITL; no physical G12/GR00/X9 verification",
-                       "pymavlink": importlib.metadata.version("pymavlink")}
+                       "pymavlink": importlib.metadata.version("pymavlink"),
+                       "test_runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                       "arbiter_sha256": hashlib.sha256((ROOT / "lab/arbiter.py").read_bytes()).hexdigest(),
+                       "project_head": subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True).strip()}
         self.primary = [1450, 1550, 1000, 1500, 1100, 1000, 1000, 1000] + [1500] * 8
         self.stop_rc = threading.Event()
         self.child = None
@@ -66,6 +70,14 @@ class Experiment:
         provenance = json.loads((self.source / "build/g12-provenance.json").read_text())
         require(provenance["revision"] == REVISION and provenance["binary_sha256"] == hashlib.sha256(binary.read_bytes()).hexdigest(),
                 "Binary differs from the recorded build")
+        dialect_path = self.source / "build/g12_dialect.py"
+        require(provenance["dialect_sha256"] == hashlib.sha256(dialect_path.read_bytes()).hexdigest(),
+                "Dialect differs from the recorded fixed-source generation")
+        spec = importlib.util.spec_from_file_location("g12_fixed_dialect", dialect_path)
+        dialect = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(dialect)
+        # mavutil supplies transport; message schema/generator come from this fixed FC source.
+        mavutil.mavlink = dialect
         self.report["build"] = provenance
         self.output.mkdir(parents=True, exist_ok=True)
         self.work = tempfile.TemporaryDirectory(prefix="g12-owned-sitl-")
@@ -77,8 +89,10 @@ class Experiment:
         defaults_path = Path(self.work.name) / "lab.parm"
         defaults_path.write_text(defaults)
         self.report["initial_defaults"] = defaults
-        ports = [free_port(socket.SOCK_STREAM) for _ in range(2)]
-        for i, port in enumerate(ports):
+        ports = []
+        for i in range(2):
+            port = free_port(socket.SOCK_STREAM)
+            ports.append(port)
             self.links.append(mavutil.mavlink_connection(f"tcpin:127.0.0.1:{port}",
                               source_system=255, source_component=190 + i))
         self.link, self.peer = self.links
@@ -87,7 +101,9 @@ class Experiment:
                    "--defaults", str(defaults_path), "--rc-in-port", str(self.rc_port),
                    "--serial0", f"tcpclient:127.0.0.1:{ports[0]}",
                    "--serial1", f"tcpclient:127.0.0.1:{ports[1]}"]
-        for i in range(2, 10):
+        # At this exact revision SITL_State::_serial_path has 9 entries (0..8),
+        # although the CLI advertises serial9. Never index beyond that array.
+        for i in range(2, 9):
             command += [f"--serial{i}", "none"]
         self.report["command"] = command
         self.child = subprocess.Popen(command, cwd=self.work.name, stdout=self.log, stderr=subprocess.STDOUT)
@@ -103,9 +119,9 @@ class Experiment:
         require(version.flight_sw_version == 0x040701FF, "SITL did not report official Copter 4.7.1")
         self.report["autopilot_version"] = version.to_dict()
         self.safety = {name: self.parameter(name) for name in
-                       ("ARMING_CHECK", "FS_THR_ENABLE", "FS_GCS_ENABLE", "FS_OPTIONS", "FENCE_ENABLE", "FENCE_ACTION",
+                       ("ARMING_SKIPCHK", "FS_THR_ENABLE", "FS_GCS_ENABLE", "FS_OPTIONS", "FENCE_ENABLE", "FENCE_ACTION",
                         "RC_OVERRIDE_TIME", "RC_FS_TIMEOUT", "RC_OPTIONS", "MAV_GCS_SYSID", "MAV_GCS_SYSID_HI", "SIM_RC_FAIL")}
-        require(self.safety["RC_OVERRIDE_TIME"] == 3.0 and self.safety["FS_THR_ENABLE"] != 0,
+        require(self.safety["RC_OVERRIDE_TIME"] == 3.0 and self.safety["FS_THR_ENABLE"] != 0 and self.safety["ARMING_SKIPCHK"] == 0,
                 "Unexpected stock override timeout/failsafe")
         self.report["safety_before"] = self.safety
         self.wait_rc(self.primary[:4])
@@ -120,7 +136,8 @@ class Experiment:
         require(self.child.poll() is None, "Owned SITL child exited; inspect sitl.log")
         msg = self.link.recv_match(blocking=True, timeout=timeout)
         if msg and msg.get_type() != "BAD_DATA":
-            require(msg.get_srcSystem() == 1 and msg.get_srcComponent() == 1, "Unexpected MAVLink source")
+            require(msg.get_srcSystem() == 1 and msg.get_srcComponent() == 1,
+                    f"Unexpected MAVLink source {msg.get_srcSystem()}/{msg.get_srcComponent()} for {msg.get_type()}")
             if msg.get_type() == "HEARTBEAT":
                 require(not msg.base_mode & mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED, "SITL unexpectedly armed")
                 require(msg.autopilot == 3 and msg.type == 2, "Wrong autopilot/type")
@@ -163,8 +180,12 @@ class Experiment:
             action = lambda: self.link.mav.param_set_send(1, 1, name.encode(), value, mavutil.mavlink.MAV_PARAM_TYPE_INT8)
         else:
             action = lambda: self.link.mav.param_request_read_send(1, 1, name.encode(), -1)
-        msg = self.wait_for(lambda m: m.get_type() == "PARAM_VALUE" and m.param_id == name and
-                            (value is None or m.param_value == value), 5, action)
+        try:
+            msg = self.wait_for(lambda m: m.get_type() in ("PARAM_VALUE", "PARAM_ERROR") and m.param_id == name and
+                                (m.get_type() == "PARAM_ERROR" or value is None or m.param_value == value), 5, action)
+            require(msg.get_type() == "PARAM_VALUE", f"Flight controller returned {msg.to_dict()}")
+        except AssertionError as error:
+            raise AssertionError(f"Parameter {name}: {error}") from error
         return msg.param_value
 
     def manual(self, axes, link=None, target=1):

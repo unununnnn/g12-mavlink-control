@@ -21,3 +21,16 @@
 ## 仍不可推断
 
 已确认公开 SDK 版本和部分调用签名；原始摇杆有效位/采样时间、GR00实际电平/固件匹配、射频失联是否重播、X9 实际 UID/厂商补丁仍未知。模拟中的 UID 和 sysid 是明确的合成值，不能拿去识别实机。
+
+## 本阶段固定源码补充
+
+以下均为 `dbe792162d06cab66c3475fd5556bf7a120f119e`，从独立git对象检出验证，没有取用X9工作树修改：
+
+- [GCS.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/GCS_MAVLink/GCS.cpp)：实际参数 `MAV_GCS_SYSID` 默认255、`MAV_GCS_SYSID_HI` 默认0；范围匹配不是设备认证。旧 `SYSID_MYGCS` 在Copter参数迁移表中转换到新名字。
+- [RC_Channel.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/RC_Channel/RC_Channel.cpp) 和 [RC_Channels_VarInfo.h](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/RC_Channel/RC_Channels_VarInfo.h)：覆盖优先、每通道时间戳与默认3.0s超时；覆盖启用辅助通道本身不能被GCS覆盖。
+- [AP_RCProtocol_UDP.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/AP_RCProtocol/AP_RCProtocol_UDP.cpp)：SITL接收16/32字节的8/16路PWM数据；每20ms模拟一次输入，`SIM_RC_FAIL`定义见SITL.h；接收器绑定0.0.0.0，所以本实验强制独立network namespace。
+- [radio.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/ArduCopter/radio.cpp)：RC输入更新、覆盖输入与失效状态处理。输入观察与飞行failsafe动作必须分开验收。
+- [AP_Arming.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/AP_Arming/AP_Arming.cpp)：4.7迁移CHECK到SKIPCHK；`ARMING_SKIPCHK=0`是不跳过检查，不是禁用全部检查。
+- [SITL_State.h](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/AP_HAL_SITL/SITL_State.h) 与 [SITL_cmdline.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/AP_HAL_SITL/SITL_cmdline.cpp)：serial9选项与实际9项数组边界不一致；本项目只使用0–8，未修改上游代码。
+
+实际运行证据以 `docs/VALIDATION.md` 和 `artifacts/sitl/report.json` 为准。

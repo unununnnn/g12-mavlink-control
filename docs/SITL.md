@@ -2,6 +2,8 @@
 
 源码固定为 `dbe792162d06cab66c3475fd5556bf7a120f119e`（Copter-4.7.1）。只从该提交取独立源树及其固定submodule；不使用本机已有 X9 工程的工作文件或二进制，不修改飞控源码。构建记录包含编译器、submodule清单、配置命令和二进制SHA256。
 
+SITL测试解码器也从该源码固定的MAVLink定义/生成器生成，并校验SHA256；仅复用已安装pymavlink的transport。这避免旧版预生成dialect不认识本版本 `PARAM_ERROR(345)`。独立的四类Java字节向量对照仍使用已安装pymavlink2.4.49，二者用途分开。
+
 ## 重现
 
 Linux需要现有g++、make、git、Python3.10+、JDK17+、iproute2/unshare，以及 `lab/requirements.txt` 中测试依赖。`build_sitl.sh` 不安装软件、不接受SDK协议。CI在临时Ubuntu22.04 runner安装这些Python测试依赖；本机使用已有WSL环境。
@@ -34,3 +36,9 @@ sudo env "PATH=$PATH" unshare --net -- bash scripts/run_sitl.sh "$HOME/g12-copte
 只验证disarmed输入接收与相关状态；没有验证飞行中的RTL/LAND、地理围栏动作或真实链路丢包时延。stock的FENCE_ENABLE/FS_GCS_ENABLE值如为0，会如实记录为stock配置，不能据此声称已验证启用后的failsafe。当前用户X9真实参数从未载入或更改。
 
 输出：`artifacts/sitl/report.json`、`sitl.log`；CI额外保存构建日志与Java协议向量。以报告中的result为准，脚本存在不表示通过。
+
+## 固定版本启动差异
+
+- 构建必须包含 `littlefs`、`lwip` 和递归 `modules/mavlink/pymavlink`，脚本只取实际需要的固定子模块。
+- 本版本把 `ARMING_CHECK` 迁移为 `ARMING_SKIPCHK`；实验要求后者为0（不跳过检查），读回比较而不写入。
+- 本版本CLI虽然列出serial9，但 `SITL_State.h` 的 `_serial_path` 仅9项（0–8）。初次启动的SIGSEGV经本机GDB定位到被破坏的cmdline参数处理；驱动只配置0–8后继续。未补丁或重编飞控来绕过此问题。
