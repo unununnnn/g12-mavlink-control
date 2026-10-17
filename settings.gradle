@@ -2,3 +2,5 @@ pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal()
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name = 'g12-mavlink-control'
 include ':core', ':app'
+include ':bench-core'
+if (providers.gradleProperty('withSkydroid').orNull == 'true') { include ':bench' }

@@ -1,0 +1,36 @@
+plugins { id 'com.android.application' }
+def sdkPath = providers.gradleProperty('skydroidAar').orElse('../vendor/rcsdk-v1.9.2.aar').get()
+def sdkFile = file(sdkPath)
+if (!sdkFile.isFile()) { throw new GradleException('Supply the official pinned AAR with -PskydroidAar=/absolute/path/rcsdk-v1.9.2.aar') }
+def hash = java.security.MessageDigest.getInstance('SHA-256').digest(sdkFile.bytes).encodeHex().toString()
+if (hash != 'e5977ba3292246bcee026defdb8563a18adc9d5573fdfb20a6880ee469f0fde2') {
+    throw new GradleException('Unverified vendor AAR: SHA256 mismatch')
+}
+android {
+    namespace 'com.g12.bench'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+    defaultConfig {
+        applicationId 'com.g12.bench.readonly'
+        minSdk 23
+        // User-confirmed G12 OS: Android 13. Actual vendor system build remains unverified.
+        targetSdk 33
+        versionCode 2
+        versionName '0.2.0-sdk-readonly'
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    buildTypes { debug { minifyEnabled false } }
+    packaging { jniLibs { keepDebugSymbols += ['**/*.so'] } }
+    lint {
+        abortOnError true
+        // Private Android 13 bench APK; not a Play Store submission.
+        disable 'ExpiredTargetSdkVersion', 'OldTargetApi'
+    }
+}
+dependencies {
+    implementation project(':bench-core')
+    implementation files(sdkFile)
+    // Required by the Kotlin-authored SDK; version specified in the official integration guide.
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10'
+}

@@ -1,0 +1,43 @@
+name: Build G12 official SDK readonly APK
+on: [workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  bench:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Verify preinstalled Android toolchain (no license acceptance)
+        run: |
+          test -f "$ANDROID_HOME/platforms/android-35/android.jar"
+          test -d "$ANDROID_HOME/build-tools/35.0.0"
+      - name: Fetch official pinned RCSDK 1.9.2
+        run: bash scripts/fetch_skydroid.sh
+      - name: Core and asynchronous read-only session regressions
+        run: |
+          mkdir -p artifacts/bench
+          bash scripts/test.sh | tee artifacts/bench/java-tests.txt
+          python3 -m unittest lab.test_arbiter -v
+      - name: Build and lint actual SDK APK
+        run: gradle --no-daemon -PwithSkydroid=true :bench-core:check :bench:assembleDebug :bench:lintDebug
+      - name: Inspect SDK contents, compiled boundary, permissions and signature
+        run: |
+          cp bench/build/outputs/apk/debug/bench-debug.apk artifacts/bench/g12-sdk-readonly-0.2.0.apk
+          python3 scripts/verify_bench.py artifacts/bench/g12-sdk-readonly-0.2.0.apk vendor/rcsdk-v1.9.2.aar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g12-sdk-readonly-android13
+          path: |
+            artifacts/bench/
+            bench/build/reports/lint-results-debug.html
+            bench/build/reports/lint-results-debug.xml
+          if-no-files-found: error
+          retention-days: 30

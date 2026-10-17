@@ -1,5 +1,7 @@
 # 云卓 SDK 适配边界
 
+**更新：**现已实现独立 `bench` 只读APK集成，目标为用户确认的Android13 G12。SDK初始化、真实通道GET和链路LISTEN已接入；详细打包依据、API/ABI、构建与未验证边界见 [SDK_BENCH](SDK_BENCH.md)。下文记录早期签名核对阶段，关于“未集成APK”“许可阻塞”的表述不再描述当前只读交付；完整控制能力仍禁用。
+
 截至 2026-10-17：初次本机搜索未找到 SDK；随后从官网二次开发标签定位并只读取得 [官方 RCSDK-Demo](https://gitee.com/skydroid/rcsdk-demo)，commit `d9c6bcab8bb9993cd16f117c01a7601dce10ea6a`。README 明确列出 G12，版本1.9.2；AAR SHA256 `E5977BA3292246BCEE026DEFDB8563A18ADC9D5573FDFB20A6880EE469F0FDE2`。厂商包仅在项目外 `vendor-review/rcsdk-demo` 核对，没有提交或打包。
 
 实际接口已与 README、Java示例和 AAR 的 javap 签名交叉核对：`RCSDKManager.INSTANCE.initSDK/connectToRC`；`KeyManager.INSTANCE.get(RemoteControllerKey.INSTANCE.getKeyChannels(), CompletionCallbackWith<int[]>)`；`PipelineManager.INSTANCE.createG12G20Pipeline()`；`Pipeline.setOnCommListener/isConnected/writeData(byte[])`。G12摇杆是 GET；H16 LISTEN 不应照搬。README v1.7.3 指 G12/G20 数传改 UDP，要求 Android系统20250110及以后；这不意味着接收机到飞控不是串口。
