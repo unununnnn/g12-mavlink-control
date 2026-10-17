@@ -1,4 +1,4 @@
-name: Verify simulation
+name: Verify Android and isolated SITL
 on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
@@ -14,6 +14,8 @@ jobs:
           java-version: '17'
       - name: Offline core regression
         run: bash scripts/test.sh
+      - name: Cross-process authority regression
+        run: python3 -m unittest lab.test_arbiter -v
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
@@ -31,4 +33,36 @@ jobs:
             app/build/reports/lint-results-debug.html
             artifacts/vectors.json
           if-no-files-found: error
+          retention-days: 14
+  sitl:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install pinned test dependencies on ephemeral runner
+        run: python -m pip install -r lab/requirements.txt
+      - name: Compile actual Java frames and verify independent oracle
+        run: |
+          bash scripts/test.sh
+          python scripts/check_vectors.py
+          python -m unittest lab.test_arbiter -v
+      - name: Build stock fixed revision (no firmware patches)
+        run: bash scripts/build_sitl.sh "$RUNNER_TEMP/g12-copter-4.7.1" > artifacts/sitl-build.log 2>&1
+      - name: Run only inside a new loopback network namespace
+        run: sudo env "PATH=$PATH" unshare --net -- bash scripts/run_sitl.sh "$RUNNER_TEMP/g12-copter-4.7.1"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g12-stock-sitl-evidence
+          path: |
+            artifacts/sitl-build.log
+            artifacts/sitl/
+            artifacts/vectors.json
           retention-days: 14

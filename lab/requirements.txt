@@ -1,0 +1,8 @@
+# CI-only disposable environment; local environment may already provide these.
+empy==3.3.4
+future==1.0.0
+lxml==5.3.0
+numpy==1.26.4
+pexpect==4.9.0
+pymavlink==2.4.49
+PyYAML==6.0.2
