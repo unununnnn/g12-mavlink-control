@@ -56,6 +56,7 @@ public final class ChannelTests {
         Rig v1full=new Rig();v1full.wire=1;v1full.begin();v1full.run(500);check(v1full.s.state()==ChannelSession.State.FAULT&&v1full.controls==0,"MAVLink1 cannot silently lose auxiliaries");
         Rig signed=new Rig();signed.ready();byte[] sign=Arrays.copyOf(Wire.channels(2,245,191,0,7,1,sample(18)),63);sign[2]=1;signed.s.receive(sign);check(signed.s.state()==ChannelSession.State.FAULT,"signed stream not bypassed");
         StringBuilder json=new StringBuilder("[");int[] counts={16,18,8};for(int k=0;k<counts.length;k++){if(k>0)json.append(',');json.append('"');for(byte b:Wire.channels(k==2?1:2,245,191,30+k,7,1,sample(counts[k])))json.append(String.format("%02x",b&255));json.append('"');}
+        Files.createDirectories(Path.of("artifacts"));
         Files.writeString(Path.of("artifacts/channel-vectors.json"),json.append(']').toString());
         System.out.println("PASS: "+checks+" raw-channel assertions; no setup/binding, all18 channels, synthetic FC only");
     }
