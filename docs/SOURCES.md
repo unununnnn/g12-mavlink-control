@@ -9,7 +9,7 @@
 5. [Copter-4.7.1 GCS_Common.cpp](https://github.com/ArduPilot/ardupilot/blob/dbe792162d06cab66c3475fd5556bf7a120f119e/libraries/GCS_MAVLink/GCS_Common.cpp)：tag 经 GitHub API 核对，commit `dbe792162d06cab66c3475fd5556bf7a120f119e`。`handle_manual_control` 检查发送方 GCS sysid、目标 sysid，并调用 `sysid_mygcs_seen`。只参考行为，没有复制 GPL 飞控代码。
 6. [Android AGP 8.9 兼容表](https://developer.android.com/build/releases/agp-8-9-0-release-notes)：AGP 8.9.2，Gradle 8.11.1，JDK17，最高 compile SDK35，Build Tools35.0.0。
 7. [官方RCSDK-Demo](https://gitee.com/skydroid/rcsdk-demo)，本地固定commit `d9c6bcab8bb9993cd16f117c01a7601dce10ea6a`：README、HomeActivityForJava.java、ReadRCButtonHelper.java、app/build.gradle及AAR公开签名核对。版本1.9.2，AAR SHA256 `E5977BA3292246BCEE026DEFDB8563A18ADC9D5573FDFB20A6880EE469F0FDE2`。G12采用KeyChannels GET；Pipeline写接口返回void，不能当成飞控接收ACK。README记录SDK1.7.3的G12/G20管道改UDP且有系统版本条件。没有LICENSE文件，Gitee也提示未声明许可证；不把厂商源码/AAR纳入本仓库。
-8. 下载中心的 G12产品说明书V2.1 已只读提取，共113页，PDF第56页/正文第51页再次明确链接RCSDK-Demo；与官网前端链接一致。GR00资料包已确认可下载（3956431字节），其中为RAR文档包，尚不能据“已下载”声称完成针脚/电平核对。
+8. 下载中心的 G12产品说明书V2.1 已只读提取，共113页，PDF第56页/正文第51页再次明确链接RCSDK-Demo；与官网前端链接一致。GR00资料包已只读解析（3956431字节），其中手册正文为V1.1、4页；透传/SBUS针脚核对与未关闭电气边界见[GR00_REVIEW.md](GR00_REVIEW.md)。没有据5V模块供电推断UART电平。
 
 ## 本地证据（仅只读，不再分发）
 
