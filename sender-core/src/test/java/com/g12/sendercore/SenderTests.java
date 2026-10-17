@@ -54,7 +54,6 @@ public final class SenderTests {
         for (int i=0;i<8;i++) check((release.getShort(i*2)&65535)==(i==4||i==1||i==6||i==3?0:65535), "release preserves unselected "+i);
         rejects(() -> manual.release(0), "no guessed manual release mapping");
         Fake f = new Fake(); SendEngine e = started(f, Mapping.Message.MANUAL_CONTROL);
-        rejects(() -> e.start(manual,f,true,true,2), "duplicate start");
         e.tick(); var oldDone = f.callback; byte[] first = f.frame.clone();
         check(f.writes==1 && e.sdkReturns()==1 && e.echoed()==0, "SDK return is not wire echo");
         f.time=100; e.sample(NEUTRAL,100,2,true); e.tick(); check(f.writes==1, "one unacknowledged frame only");
@@ -90,6 +89,16 @@ public final class SenderTests {
         check(back.state()==SendEngine.State.STOPPED,"clock rollback stops");
         Fake invalid=new Fake();var inv=started(invalid,Mapping.Message.MANUAL_CONTROL);invalid.time=100;inv.sample(new int[]{0,1000,601,2200},100,2,true);inv.tick();
         check(invalid.writes==0 && inv.state()==SendEngine.State.STOPPED,"range violation sends no frame");
+        Fake duplicate=new Fake();var dup=started(duplicate,Mapping.Message.MANUAL_CONTROL);dup.tick();
+        rejects(() -> dup.start(manual,duplicate,true,true,2),"duplicate start rejected");
+        check(dup.state()==SendEngine.State.STOPPED && duplicate.writes==1,"duplicate start stops existing writer");
+        Fake releaseBusy=new Fake();var rb=started(releaseBusy,Mapping.Message.RC_CHANNELS_OVERRIDE);rb.tick();
+        rejects(rb::releaseAndStop,"busy release rejected");
+        check(rb.state()==SendEngine.State.STOPPED && releaseBusy.writes==1,"failed release stops without extra frame");
+        Fake manualRelease=new Fake();var mr=started(manualRelease,Mapping.Message.MANUAL_CONTROL);mr.tick();mr.receive(manualRelease.frame);
+        rejects(mr::releaseAndStop,"manual release rejected");check(mr.state()==SendEngine.State.STOPPED,"manual release request only stops");
+        Fake badTime=new Fake();var bt=started(badTime,Mapping.Message.MANUAL_CONTROL);bt.sample(NEUTRAL,-1,2,true);
+        check(bt.state()==SendEngine.State.STOPPED,"negative receipt invalidates session");
         Fake longRun=new Fake();var l=started(longRun,Mapping.Message.MANUAL_CONTROL);
         for(int i=0;i<=100;i++){longRun.time=i*100;if(i>0)l.sample(NEUTRAL,longRun.time,i+1,true);l.tick();if(l.waiting())l.receive(longRun.frame);}
         check(l.state()==SendEngine.State.STOPPED && longRun.writes==100,"10 second finite burst, no seq reuse within session");

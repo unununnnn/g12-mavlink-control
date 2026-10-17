@@ -33,7 +33,7 @@ public final class SendEngine {
     /** Timestamp must be the actual local receipt time, never refreshed when reusing cached values. */
     public synchronized void sample(int[] values, long receiptMillis, long id, boolean connected) {
         long now = clock.now();
-        if (!connected || values == null || receiptMillis > now || (sampleId >= 0 && id <= sampleId)
+        if (!connected || values == null || receiptMillis < 0 || id < 1 || receiptMillis > now || (sampleId >= 0 && id <= sampleId)
                 || (inputAt >= 0 && receiptMillis < inputAt)) {
             stop("输入断开/重复/时钟无效");
             return;
@@ -41,7 +41,10 @@ public final class SendEngine {
         raw = values.clone(); inputAt = receiptMillis; sampleId = id; inputConnected = true;
     }
     public synchronized void start(Mapping config, Transport transport, boolean pcDisconnectedConfirmed, boolean firmwareConfirmed, int initialSequence) {
-        if (state != State.STOPPED) throw new IllegalStateException("已经发送，禁止重复启动");
+        if (state != State.STOPPED) {
+            stop("重复启动请求：已停止，须重新打开管道并手动开始");
+            throw new IllegalStateException("禁止重复启动，当前发送已停止");
+        }
         long now = clock.now();
         if (!pcDisconnectedConfirmed || !firmwareConfirmed) throw new IllegalArgumentException("须确认仅接电脑、飞控断开和20250110+数传系统");
         if (config == null || transport == null || !transport.connected() || !inputConnected || raw == null
@@ -105,8 +108,11 @@ public final class SendEngine {
         if (state == State.RELEASING) stop("仅映射RC通道的释放帧已获电脑回显；不证明主控恢复");
     }
     public synchronized void releaseAndStop() {
-        if (state != State.SENDING || awaiting != null || mapping.message != Mapping.Message.RC_CHANNELS_OVERRIDE)
-            throw new IllegalStateException("须为RC覆盖模式、无在途帧；否则只停止");
+        if (state != State.SENDING) throw new IllegalStateException("当前未在发送");
+        if (awaiting != null || mapping.message != Mapping.Message.RC_CHANNELS_OVERRIDE) {
+            stop("释放条件不满足：仅停止，未发送释放帧");
+            throw new IllegalStateException("有在途帧或非RC模式，已停止；未发送释放");
+        }
         long now = clock.now();
         if (now < lastTick || now - lastTick >= INPUT_MS || !link.connected() || !inputConnected || raw == null
                 || now < inputAt || now - inputAt >= INPUT_MS || now - started >= BURST_MS) {
