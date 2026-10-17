@@ -2,6 +2,8 @@
 
 **当前开发交付：G12 X9直连 0.4.0。** 独立 `x9` 应用首次引导校准四轴/接管开关、录入实际透传波特率并绑定X9；以后只需连接，物理开关请求/退出持续传输。按用户确认取消总时长和解锁状态限制，保留输入/链路时效与故障停发。真实SDK集成，尚未完成G12/GR00/X9真机或飞行验收。见[直连说明与复现](docs/X9_DIRECT.md)。
 
+[下载直连APK](https://github.com/unununnnn/g12-mavlink-control/releases/download/v0.4.0-x9-direct/g12-x9-direct-0.4.0.apk) · [预发布与校验报告](https://github.com/unununnnn/g12-mavlink-control/releases/tag/v0.4.0-x9-direct)。源码 `8473c44`，CI与隔离SITL通过；本项目私有，下载需对应GitHub访问权限。
+
 **启停修复候选版：sender 0.3.1 / readonly 0.2.1。** 用户定位到“停止后再次读取出现 SDK code=101 timeout”。前台停止采集现在保留 SDK 连接，恢复时等旧请求结束后发起新 GET；释放端口和后台仍完整断开。软件回归通过，G12 实测待确认。见[启停修复与复测步骤](docs/RESTART_FIX.md)。
 
 **此前台架交付：**用户自报只读版测试成功后，新增独立 `sender` **真实SDK串口台架发送版**。仅用于GR00 UART接电脑收包/逐帧回显，飞控断开；显式映射、启停、最多一帧在途和10秒窗口。不是完整双链路遥控或飞行版本。见[发送版说明](docs/SERIAL_BENCH.md)。
